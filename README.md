@@ -24,7 +24,7 @@
 <a href="https://chat.whatsapp.com/ElIwrFJuUTB5B8rJS1ABSI"><img src="https://img.shields.io/badge/Join WhatsApp Group-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"></a>
    
 <p align="center">
-<a href="https://github.com/Exy_Xyz/followers"><img title="Followers" src="https://img.shields.io/github/followers/ExyXyz?color=red&style=flat-square"></a>
+<a href="https://github.com/ExyXyz/followers"><img title="Followers" src="https://img.shields.io/github/followers/ExyXyz?color=red&style=flat-square"></a>
 <a href="https://github.com/ExyXyz/Ekushi-Bot/stargazers/"><img title="Stars" src="https://img.shields.io/github/stars/ExyXyz/Ekushi-Bot?color=blue&style=flat-square"></a>
 <a href="https://github.com/ExyXyz/Ekushi-Bot/network/members"><img title="Forks" src="https://img.shields.io/github/forks/ExyXyz/Ekushi-Bot?color=red&style=flat-square"></a>
 <a href="https://github.com/ExyXyz/Ekushi-Bot/watchers"><img title="Watching" src="https://img.shields.io/github/watchers/Ethix-Xsid/Ethix-Xsid2?label=Watchers&color=blue&style=flat-square"></a>
@@ -43,7 +43,7 @@
 
 ## `DEVELOPERS`
 <div align="center">
-<a href="[https://github.com/Exy_Xyz]"><img src="https://github.com/Exy_Xyz.png" width="200" height="200" alt="Ash"/></a>
+<a href="[https://github.com/ExyXyz]"><img src="https://github.com/ExyXyz.png" width="200" height="200" alt="Ash"/></a>
  </div>
 <br>
 <h4 align="left">
