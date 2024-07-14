@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: gssbotwa
+    env: docker
+    region: Frankfurt
+    plan: free
+ 
