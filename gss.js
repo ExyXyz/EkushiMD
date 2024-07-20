@@ -4679,189 +4679,134 @@ case 'twt':
 
 
   case 'ytmp4':
-    case 'ytv':
-    case 'yt':
-      try {
-        if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-        if (!text) {
-          m.reply('Masukan link video YouTube nya!');
-          doReact("❌");
-          return;
-        }
-    
-        m.reply(mess.wait);
-        await doReact("🕘");
-    
-        const ytdl = require('@distube/ytdl-core');
-        const yts = require('yt-search');
-        const ffmpeg = require('fluent-ffmpeg');
-        const fs = require('fs');
-        const path = require('path');
-    
-        // Read cookies from the file
-        const cookies = fs.readFileSync('cookies.txt', 'utf8');
-    
-        const getRandomFileName = () => `file_${Math.floor(Math.random() * 1000) + 1}.mp4`;
-    
-        const tempDir = '/temp';
-        if (!fs.existsSync(tempDir)) {
-          fs.mkdirSync(tempDir);
-        }
-    
-        const videoFilePath = path.resolve(tempDir, getRandomFileName());
-        const audioFilePath = path.resolve(tempDir, getRandomFileName());
-        const outputFilePath = path.resolve(tempDir, getRandomFileName());
-    
-        const downloadStreamToFile = (stream, filePath) => {
-          return new Promise((resolve, reject) => {
-            const writeStream = fs.createWriteStream(filePath);
-            stream.pipe(writeStream);
-            stream.on('end', () => resolve());
-            stream.on('error', (error) => reject(error));
-          });
-        };
-    
-        const isUrl = ytdl.validateURL(text);
-    
-        const getBestFormat = (formats, isVideo, maxSize = Infinity) => {
-          const filteredFormats = formats
-            .filter(format => format.container === 'mp4')
-            .filter(format => isVideo ? format.hasVideo : format.hasAudio)
-            .filter(format => isVideo ? format.qualityLabel <= '1080p60' : true)
-            .filter(format => parseInt(format.contentLength) <= maxSize);
-          return filteredFormats[0];
-        };
-    
-        const formatBytes = (bytes) => {
-          if (bytes === 0) return '0 Bytes';
-          const k = 1024;
-          const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-          const i = Math.floor(Math.log(bytes) / Math.log(k));
-          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        };
-    
-        const formatUploadDate = (date) => {
-          const options = { year: 'numeric', month: 'long', day: 'numeric' };
-          return new Date(date).toLocaleDateString(undefined, options);
-        };
-    
-        const downloadAndSendVideo = async (videoUrl, videoTitle, videoThumbnail, videoTimestamp, videoUploader, videoUploadDate) => {
-          const info = await ytdl.getInfo(videoUrl, {
-            requestOptions: {
-              headers: {
-                cookie: cookies
-              }
-            }
-          });
-          let videoFormat = getBestFormat(info.formats, true);
-          let audioFormat = getBestFormat(info.formats, false);
-    
-          if (parseInt(videoFormat.contentLength) > 90 * 1024 * 1024) { // 90MB
-            videoFormat = getBestFormat(info.formats, true, 90 * 1024 * 1024);
-          }
-    
-          const videoStream = ytdl(videoUrl, { format: videoFormat, requestOptions: { headers: { cookie: cookies } } });
-          const audioStream = ytdl(videoUrl, { format: audioFormat, requestOptions: { headers: { cookie: cookies } } });
-    
-          await Promise.all([
-            downloadStreamToFile(videoStream, videoFilePath),
-            downloadStreamToFile(audioStream, audioFilePath)
-          ]);
-    
-          await new Promise((resolve, reject) => {
-            ffmpeg()
-              .input(videoFilePath)
-              .input(audioFilePath)
-              .outputOptions('-c:v copy')
-              .outputOptions('-c:a aac')
-              .output(outputFilePath)
-              .on('end', () => resolve())
-              .on('error', (error) => reject(error))
-              .run();
-          });
-    
-          const videoBuffer = fs.readFileSync(outputFilePath);
-    
-          const thumbnailMessage = {
-            image: {
-              url: videoThumbnail,
-            },
-            caption: `
-      ╭═════════•∞•══╮
-      │⿻ *EKUSHI ☆*
-      │  *Youtube Player* ✨
-      │⿻ *Title:* ${videoTitle}
-      │⿻ *Duration:* ${videoTimestamp}
-      │⿻ *Uploader:* ${videoUploader}
-      │⿻ *Size:* ${formatBytes(videoBuffer.length)}
-      │⿻ *Upload Date:* ${formatUploadDate(videoUploadDate)}
-      ╰══•∞•═════════╯
-            `,
-          };
-    
-          await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
-          await gss.sendMessage(m.chat, { video: videoBuffer, mimetype: 'video/mp4', caption: `Selesai Mendownload: ${videoTitle}` }, { quoted: m });
-          await doReact("✅");
-    
-          fs.unlinkSync(videoFilePath);
-          fs.unlinkSync(audioFilePath);
-          fs.unlinkSync(outputFilePath);
-        };
-    
-        if (isUrl) {
-          const videoId = ytdl.getURLVideoID(text);
-          const videoInfo = await ytdl.getInfo(videoId, {
-            requestOptions: {
-              headers: {
-                cookie: cookies
-              }
-            }
-          });
-    
-          if (videoInfo.videoDetails.isLiveContent) {
-            m.reply('Nuh uh Gabisa download Live disini');
-            await doReact("❌");
-            return;
-          }
-    
-          const { video_url, title, thumbnail, lengthSeconds, author, uploadDate } = videoInfo.videoDetails;
-          const videoTimestamp = `${Math.floor(lengthSeconds / 60)}:${lengthSeconds % 60}`;
-          
-          await downloadAndSendVideo(video_url, title, thumbnail.thumbnails[0].url, videoTimestamp, author.name, uploadDate);
-        } else {
-          const searchResult = await yts(text);
-          const firstVideo = searchResult.videos[0];
-    
-          if (!firstVideo) {
-            m.reply('Gak nemu videonya.');
-            await doReact("❌");
-            return;
-          }
-    
-          const { url, title, thumbnail, timestamp, author, uploadDate } = firstVideo;
-          
-          const videoInfo = await ytdl.getInfo(url, {
-            requestOptions: {
-              headers: {
-                cookie: cookies
-              }
-            }
-          });
-          if (videoInfo.videoDetails.isLiveContent) {
-            m.reply('Nuh uh Gabisa download Live disini');
-            await doReact("❌");
-            return;
-          }
-    
-          await downloadAndSendVideo(url, title, thumbnail, timestamp, author.name, uploadDate);
-        }
-      } catch (error) {
-        console.error('Error during video processing:', error);
-        m.reply('Ada yang error.');
+case 'ytv':
+case 'yt': {
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) {
+      m.reply('Masukan link video YouTube nya!');
+      doReact("❌");
+      return;
+    }
+
+    m.reply(mess.wait);
+    await doReact("🕘");
+
+    const { YtDlpWrap } = require('yt-dlp-wrap');
+    const yts = require('yt-search');
+    const fs = require('fs');
+    const path = require('path');
+
+    const ytDlpWrap = new YtDlpWrap();
+
+    const getRandomFileName = () => `file_${Math.floor(Math.random() * 1000) + 1}.mp4`;
+
+    const tempDir = '/temp';
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir);
+    }
+
+    const videoFilePath = path.resolve(tempDir, getRandomFileName());
+
+    const downloadVideo = (url, output) => {
+      return ytDlpWrap.execPromise([url, '-f', 'bestvideo+bestaudio', '-o', output]);
+    };
+
+    const isUrl = (url) => {
+      const urlPattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+      return !!urlPattern.test(url);
+    };
+
+    const formatBytes = (bytes) => {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const formatUploadDate = (date) => {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(date).toLocaleDateString(undefined, options);
+    };
+
+    const downloadAndSendVideo = async (videoUrl, videoTitle, videoThumbnail, videoTimestamp, videoUploader, videoUploadDate) => {
+      await downloadVideo(videoUrl, videoFilePath);
+
+      const videoBuffer = fs.readFileSync(videoFilePath);
+
+      const thumbnailMessage = {
+        image: {
+          url: videoThumbnail,
+        },
+        caption: `
+  ╭═════════•∞•══╮
+  │⿻ *EKUSHI ☆*
+  │  *Youtube Player* ✨
+  │⿻ *Title:* ${videoTitle}
+  │⿻ *Duration:* ${videoTimestamp}
+  │⿻ *Uploader:* ${videoUploader}
+  │⿻ *Size:* ${formatBytes(videoBuffer.length)}
+  │⿻ *Upload Date:* ${formatUploadDate(videoUploadDate)}
+  ╰══•∞•═════════╯
+        `,
+      };
+
+      await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
+      await gss.sendMessage(m.chat, { video: videoBuffer, mimetype: 'video/mp4', caption: `Selesai Mendownload: ${videoTitle}` }, { quoted: m });
+      await doReact("✅");
+
+      fs.unlinkSync(videoFilePath);
+    };
+
+    if (isUrl(text)) {
+      const searchResult = await ytDlpWrap.getVideoInfo(text);
+
+      if (searchResult.live_status === 'is_live') {
+        m.reply('Nuh uh Gabisa download Live disini');
         await doReact("❌");
+        return;
       }
-      break;
+
+      const { url, title, thumbnail, duration, uploader, upload_date } = searchResult;
+      const videoTimestamp = `${Math.floor(duration / 60)}:${duration % 60}`;
+
+      await downloadAndSendVideo(url, title, thumbnail, videoTimestamp, uploader, upload_date);
+    } else {
+      const searchResult = await yts(text);
+      const firstVideo = searchResult.videos[0];
+
+      if (!firstVideo) {
+        m.reply('Gak nemu videonya.');
+        await doReact("❌");
+        return;
+      }
+
+      const { url, title, thumbnail, timestamp, author, uploadDate } = firstVideo;
+
+      const videoInfo = await ytDlpWrap.getVideoInfo(url);
+      if (videoInfo.live_status === 'is_live') {
+        m.reply('Nuh uh Gabisa download Live disini');
+        await doReact("❌");
+        return;
+      }
+
+      await downloadAndSendVideo(url, title, thumbnail, timestamp, author.name, uploadDate);
+    }
+  } catch (error) {
+    console.error('Error during video processing:', error);
+    m.reply('Ada yang error.');
+    await doReact("❌");
+  }
+  break;
+}
+
     
 
 
