@@ -91,7 +91,7 @@ async function startgss() {
   
     let { state, saveCreds } = await useMultiFileAuthState(sessionName);
     let { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(chalk.red("CODED BY GOUTAM KUMAR & Ethix-Xsid"));
+    console.log(chalk.red("APPLICATION IS RUNNING - EKUSHI"));
     console.log(chalk.green(`using WA v${version.join(".")}, isLatest: ${isLatest}`));
     
  const Device = (os.platform() === 'win32') ? 'Windows' : (os.platform() === 'darwin') ? 'MacOS' : 'Linux'
@@ -143,7 +143,7 @@ async function startgss() {
     
      // Manage Device Loging
  if (!gss.authState.creds.registered && isSessionPutted) {
-    const sessionID = process.env.SESSION_ID.split('Ethix-MD&')[1];
+    const sessionID = process.env.SESSION_ID.split('Ekushi')[1];
     const pasteUrl = `https://pastebin.com/raw/${sessionID}`;
     const response = await fetch(pasteUrl);
     const text = await response.text();
@@ -209,7 +209,7 @@ async function getMessage(key) {
         return msg?.message;
     }
     return {
-        conversation: "Hai im gss botwa",
+        conversation: "Hello ekushi disini",
     };
 }
 
@@ -259,8 +259,8 @@ gss.ev.on('group-participants.update', async (anu) => {
                 // Welcome message
                 if (anu.action == 'add') {
                     const userName = num.split('@')[0];
-                    const joinTime = moment.tz('Asia/Kolkata').format('HH:mm:ss');
-                    const joinDate = moment.tz('Asia/Kolkata').format('DD/MM/YYYY');
+                    const joinTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
+                    const joinDate = moment.tz('Asia/Jakarta').format('DD/MM/YYYY');
                     const membersCount = metadata.participants.length;
 
                     const welcomeMessage = `> Hello @${userName}! Welcome to *${metadata.subject}*.\n> You are the ${membersCount}th member.\n> Joined at: ${joinTime} on ${joinDate}`;
@@ -280,8 +280,8 @@ gss.ev.on('group-participants.update', async (anu) => {
                 // Left message
                 else if (anu.action == 'remove') {
                     const userName = num.split('@')[0];
-                    const leaveTime = moment.tz('Asia/Kolkata').format('HH:mm:ss');
-                    const leaveDate = moment.tz('Asia/Kolkata').format('DD/MM/YYYY');
+                    const leaveTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
+                    const leaveDate = moment.tz('Asia/Jakarta').format('DD/MM/YYYY');
                     const membersCount = metadata.participants.length;
 
                     const leftMessage = `> Goodbye @${userName} from ${metadata.subject}.\n> We are now ${membersCount} in the group.\n> Left at: ${leaveTime} on ${leaveDate}`;
@@ -392,7 +392,7 @@ gss.ev.on('group-participants.update', async (anu) => {
         // Add your custom message when the connection is open
         console.log('Connected...', update);
         gss.sendMessage(gss.user.id, {
-            text: `*hi bro! 🫡*\n_gss botwa v2 bot has successfully connected to the server_`
+            text: `*BOT ACTIVATED*\n`
         });
     }
 });

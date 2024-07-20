@@ -4678,7 +4678,7 @@ case 'twt':
         
 
 
-  case 'ytmp4':
+    case 'ytmp4':
 case 'ytv':
 case 'yt': {
   try {
@@ -4693,12 +4693,11 @@ case 'yt': {
     m.reply(mess.wait);
     await doReact("🕘");
 
-    const { YtDlpWrap } = require('yt-dlp-wrap');
+    const ytdl = require('@distube/ytdl-core');
     const yts = require('yt-search');
+    const ffmpeg = require('fluent-ffmpeg');
     const fs = require('fs');
     const path = require('path');
-
-    const ytDlpWrap = new YtDlpWrap();
 
     const getRandomFileName = () => `file_${Math.floor(Math.random() * 1000) + 1}.mp4`;
 
@@ -4708,19 +4707,27 @@ case 'yt': {
     }
 
     const videoFilePath = path.resolve(tempDir, getRandomFileName());
+    const audioFilePath = path.resolve(tempDir, getRandomFileName());
+    const outputFilePath = path.resolve(tempDir, getRandomFileName());
 
-    const downloadVideo = (url, output) => {
-      return ytDlpWrap.execPromise([url, '-f', 'bestvideo+bestaudio', '-o', output]);
+    const downloadStreamToFile = (stream, filePath) => {
+      return new Promise((resolve, reject) => {
+        const writeStream = fs.createWriteStream(filePath);
+        stream.pipe(writeStream);
+        stream.on('end', () => resolve());
+        stream.on('error', (error) => reject(error));
+      });
     };
 
-    const isUrl = (url) => {
-      const urlPattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-      return !!urlPattern.test(url);
+    const isUrl = ytdl.validateURL(text);
+
+    const getBestFormat = (formats, isVideo, maxSize = Infinity) => {
+      const filteredFormats = formats
+        .filter(format => format.container === 'mp4')
+        .filter(format => isVideo ? format.hasVideo : format.hasAudio)
+        .filter(format => isVideo ? format.qualityLabel <= '1080p60' : true)
+        .filter(format => parseInt(format.contentLength) <= maxSize);
+      return filteredFormats[0];
     };
 
     const formatBytes = (bytes) => {
@@ -4737,9 +4744,35 @@ case 'yt': {
     };
 
     const downloadAndSendVideo = async (videoUrl, videoTitle, videoThumbnail, videoTimestamp, videoUploader, videoUploadDate) => {
-      await downloadVideo(videoUrl, videoFilePath);
+      const info = await ytdl.getInfo(videoUrl);
+      let videoFormat = getBestFormat(info.formats, true);
+      let audioFormat = getBestFormat(info.formats, false);
 
-      const videoBuffer = fs.readFileSync(videoFilePath);
+      if (parseInt(videoFormat.contentLength) > 90 * 1024 * 1024) { // 90MB
+        videoFormat = getBestFormat(info.formats, true, 90 * 1024 * 1024);
+      }
+
+      const videoStream = ytdl(videoUrl, { format: videoFormat });
+      const audioStream = ytdl(videoUrl, { format: audioFormat });
+
+      await Promise.all([
+        downloadStreamToFile(videoStream, videoFilePath),
+        downloadStreamToFile(audioStream, audioFilePath)
+      ]);
+
+      await new Promise((resolve, reject) => {
+        ffmpeg()
+          .input(videoFilePath)
+          .input(audioFilePath)
+          .outputOptions('-c:v copy')
+          .outputOptions('-c:a aac')
+          .output(outputFilePath)
+          .on('end', () => resolve())
+          .on('error', (error) => reject(error))
+          .run();
+      });
+
+      const videoBuffer = fs.readFileSync(outputFilePath);
 
       const thumbnailMessage = {
         image: {
@@ -4763,21 +4796,24 @@ case 'yt': {
       await doReact("✅");
 
       fs.unlinkSync(videoFilePath);
+      fs.unlinkSync(audioFilePath);
+      fs.unlinkSync(outputFilePath);
     };
 
-    if (isUrl(text)) {
-      const searchResult = await ytDlpWrap.getVideoInfo(text);
+    if (isUrl) {
+      const videoId = ytdl.getURLVideoID(text);
+      const videoInfo = await ytdl.getInfo(videoId);
 
-      if (searchResult.live_status === 'is_live') {
+      if (videoInfo.videoDetails.isLiveContent) {
         m.reply('Nuh uh Gabisa download Live disini');
         await doReact("❌");
         return;
       }
 
-      const { url, title, thumbnail, duration, uploader, upload_date } = searchResult;
-      const videoTimestamp = `${Math.floor(duration / 60)}:${duration % 60}`;
-
-      await downloadAndSendVideo(url, title, thumbnail, videoTimestamp, uploader, upload_date);
+      const { video_url, title, thumbnail, lengthSeconds, author, uploadDate } = videoInfo.videoDetails;
+      const videoTimestamp = `${Math.floor(lengthSeconds / 60)}:${lengthSeconds % 60}`;
+      
+      await downloadAndSendVideo(video_url, title, thumbnail.thumbnails[0].url, videoTimestamp, author.name, uploadDate);
     } else {
       const searchResult = await yts(text);
       const firstVideo = searchResult.videos[0];
@@ -4789,9 +4825,9 @@ case 'yt': {
       }
 
       const { url, title, thumbnail, timestamp, author, uploadDate } = firstVideo;
-
-      const videoInfo = await ytDlpWrap.getVideoInfo(url);
-      if (videoInfo.live_status === 'is_live') {
+      
+      const videoInfo = await ytdl.getInfo(url);
+      if (videoInfo.videoDetails.isLiveContent) {
         m.reply('Nuh uh Gabisa download Live disini');
         await doReact("❌");
         return;
@@ -4806,8 +4842,6 @@ case 'yt': {
   }
   break;
 }
-
-    
 
 
 
