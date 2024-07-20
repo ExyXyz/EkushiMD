@@ -99,7 +99,6 @@
     "ytdl-core": "^4.11.5",
     "youtubedl-core": "^4.11.4",
     "ytsr": "^3.8.4"
-    "@distube/ytdl-core": "^4.13.5"
   },
   "directories": {
     "lib": "lib",
