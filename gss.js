@@ -5,11 +5,12 @@ const fonts = require('./lib/font.js');
 const menufont = require('./lib/menufont.js');
 const DB = require('./lib/scraper')
 const uploadImage = require('./lib/uploadImage.js');
-const { gssrentbot, conns } = require('./RentBot')
 const languages = require('./lib/language');
 const got = require('got');
 const more = String.fromCharCode(8206)
 const readmore = more.repeat(4001)
+const SpottyDL = require('spottydl');
+const { youtubedl } = require('@bochilteam/scraper-sosmed');
 const availableStyles = Object.keys(fonts);
 const availableFontStyles = Object.keys(menufont);
 const { BufferJSON, WA_DEFAULT_EPHEMERAL, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, areJidsSameUser,getAggregateVotesInPollMessage, getContentType } = require('@whiskeysockets/baileys')
@@ -17,7 +18,7 @@ const fs = require('fs')
 const fsx = require('fs-extra')
 const yts = require('yt-search');
 const ytsr = require('ytsr');
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 const util = require('util')
 const truecallerjs = require("truecallerjs");
 const ffmpeg = require('fluent-ffmpeg');
@@ -75,7 +76,6 @@ let autoRecord = false;
 
 const mongoDBUrl = process.env.MONGO_DB || 'mongodb+srv://mohsin:mohsin@cluster0.iauaztt.mongodb.net/?retryWrites=true&w=majority';
 
-let akinator = global.db.data.game.akinator = []
 let currentPollIndex = 0;
 let ytsOptionIndex = 1;
 const ytsSearchResults = new Map();
@@ -124,8 +124,8 @@ const isCommand = isAsu ? body.replace(pric, '').trim().split(/ +/).shift().toLo
         const qmsg = (quoted.msg || quoted)
         const isMedia = /image|video|sticker|audio/.test(mime)
 const isViewOnce = ["viewOnceMessageV2","viewOnceMessage"].includes(m.type)
-	const botname = "𝐆𝐒𝐒_𝚩𝚯𝚻𝐖𝚫";
-	const devlopernumber = "917050906659";
+	const botname = "EKUSHI ☆";
+	const devlopernumber = "6283878300449";
         // Group
         const groupMetadata = m.isGroup ? await gss.groupMetadata(m.chat).catch(e => {}) : ''
         const groupName = m.isGroup ? groupMetadata.subject : ''
@@ -157,7 +157,7 @@ const seconds = Math.floor(uptime % 60); // Calculate seconds
 //Uptime
   const uptimeMessage = `*I am alive now since ${day}d ${hours}h ${minutes}m ${seconds}s*`;
   
-  const runMessage = `*☀️ ${day} Day*\n *🕐 ${hours} Hour*\n *⏰ ${minutes} Minimum*\n *⏱️ ${seconds} Seconds*\n`;
+  const runMessage = `*☀️ ${day} Hari*\n *🕐 ${hours} Jam*\n *⏰ ${minutes} Menit*\n *⏱️ ${seconds} Detik*\n`;
   
 async function doReact(emoji) {
       let react = {
@@ -365,7 +365,6 @@ const reactionMessage = {
   *🔭 ᴘʟᴀᴛғᴏʀᴍ:* ${os.platform()} 
   *🧿 sᴇʀᴠᴇʀ:* ${os.hostname()} 
   *💻 ᴏs:* ${OS} 
-  *📍 ɪᴘ:* ${ip} 
   *🌎 ᴄᴏᴜɴᴛʀʏ:* ${cr} 
   *💬 ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ:* ${cc} 
 
@@ -376,11 +375,6 @@ const reactionMessage = {
     - *ᴏ ᴛ ʜ ᴇ ʀ* - 
   *📅 Wᴇᴇᴋꜱ:* ${weeks} 
   *📆 Dᴀᴛᴇꜱ:* ${dates} 
-  *🔁 NᴇᴛꜱIɴ:* ${netsIn} 
-  *🔁 NᴇᴛꜱOᴜᴛ:* ${netsOut} 
-  *💿 DʀɪᴠᴇTᴏᴛᴀʟ:* ${driveTotal} 
-  *💿 DʀɪᴠᴇUꜱᴇᴅ:* ${driveUsed} 
-  *⚙️ DʀɪᴠᴇPᴇʀ:* ${drivePer} 
  
   *乂 ɴᴏᴅᴇJS ᴍᴇᴍᴏʀʏ ᴜsᴀɢᴇ* 
    ${'```' + Object.keys(used).map((key, _, arr) => `${key.padEnd(Math.max(...arr.map(v => v.length)), ' ')}: ${format(used[key])}`).join('\n') + '```' }
@@ -400,7 +394,7 @@ try {
         let imageCaption = quotedMessage.imageMessage.caption;
         let imageUrl = await gss.downloadAndSaveMediaMessage(quotedMessage.imageMessage);
         gss.sendMessage(m.chat, { image: { url: imageUrl }, caption: imageCaption });
-        m.reply('*Status Download Successful: by Gss_Botwa*');
+        m.reply('*Status Download Successful: by EKUSHI ☆*');
       }
 
       // Check if it's a video
@@ -408,7 +402,7 @@ try {
         let videoCaption = quotedMessage.videoMessage.caption;
         let videoUrl = await gss.downloadAndSaveMediaMessage(quotedMessage.videoMessage);
         gss.sendMessage(m.chat, { video: { url: videoUrl }, caption: videoCaption });
-        m.reply('*Status Download Successful: by Gss_Botwa*');
+        m.reply('*Status Download Successful: by EKUSHI ☆*');
       }
     }
   }
@@ -444,7 +438,7 @@ let chats = db.data.chats[m.chat]
                 if (!('mute' in chats)) chats.mute = false
                 if (!('antilink' in chats)) chats.antilink = false
             } else global.db.data.chats[m.chat] = {
-                antiviewonce: true,
+                antiviewonce: false,
                 antibot: true,
                 mute: false,
                 antilink: false,
@@ -453,22 +447,25 @@ let chats = db.data.chats[m.chat]
 */
 
 
-let chats = db.data.chats[m.chat]
-if (typeof chats !== 'object') db.data.chats[m.chat] = {}
+let chats = db.data.chats[m.chat];
+if (typeof chats !== 'object') db.data.chats[m.chat] = {};
 if (chats) {
-    if (!('antiviewonce' in chats)) chats.antiviewonce = false
-    if (!('antibot' in chats)) chats.antibot = true
-    if (!('mute' in chats)) chats.mute = false
-    if (!('antilink' in chats)) chats.antilink = false
-    if (!('antidelete' in chats)) chats.antidelete = true // Add 'antidelete' if not present
-} else global.db.data.chats[m.chat] = {
-    antiviewonce: true,
-    antibot: true,
-    mute: false,
-    antilink: false,
-    antidelete: true, // Add 'antidelete' by default
+    if (!('antiviewonce' in chats)) chats.antiviewonce = true;
+    if (!('antibot' in chats)) chats.antibot = true;
+    if (!('mute' in chats)) chats.mute = false;
+    if (!('antilink' in chats)) chats.antilink = false;
+    if (!('antidelete' in chats)) chats.antidelete = true;
+    if (!('animeUpdateActive' in chats)) chats.animeUpdateActive = false; // Initialize animeUpdateActive
+} else {
+    global.db.data.chats[m.chat] = {
+        antiviewonce: false,
+        antibot: true,
+        mute: false,
+        antilink: false,
+        antidelete: true,
+        animeUpdateActive: false, // Add animeUpdateActive by default
+    };
 }
-
 
 	    let setting = db.data.settings[botNumber]
         if (typeof setting !== 'object') db.data.settings[botNumber] = {}
@@ -505,7 +502,7 @@ if (!('autobio' in setting)) setting.autobio = false
         })
 
 
-/*antiviewonce*/
+        /*antiviewonce*/
     if ( db.data.chats[m.chat].antiviewonce && m.mtype == 'viewOnceMessageV2') {
     	if (m.isBaileys && m.fromMe) return
         let val = { ...m }
@@ -514,7 +511,6 @@ if (!('autobio' in setting)) setting.autobio = false
         val.message = msg
         await gss.sendMessage(m.chat, { forward: val }, { quoted: m })
     }
-
 
 
 /*AUTOBIO*/
@@ -530,7 +526,7 @@ async function setBio() {
                 second: '2-digit'
             };
             const timeString = moment(date).tz('Asia/Kolkata').format('MM/DD/YYYY ⌚ hh:mm:ss A');
-            const status = `📆 ${timeString} gssbotwa ⚡`;
+            const status = `📆 ${timeString} EKUSHI ☆ ⚡`;
             await gss.updateProfileStatus(status).catch(_ => _);
         }
     }, 60000);
@@ -584,36 +580,27 @@ if (global.autoBlock && m.sender.startsWith('212')) {
 
    
 	    
-moment.tz.setDefault("Asia/Kolkata").locale("id");
+moment.tz.setDefault("Asia/Jakarta").locale("id");
 
-const today = moment.tz('Asia/Kolkata').format('dddd, DD MMMM YYYY');
-const wibTime = moment.tz('Asia/Kolkata').format('HH:mm:ss');
-const currentTime = moment().tz('Asia/Kolkata').format('HH:mm:ss');
+const today = moment.tz('Asia/Jakarta').format('dddd, DD MMMM YYYY');
+const wibTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
+const currentTime = moment().tz('Asia/Jakarta').format('HH:mm:ss');
 
-let time; 
+let greetingTime;
 
-if (currentTime < "23:59:00") {
-    var greetingTime = 'Good Night 🏙️';
+if (currentTime < "04:00:00") {
+  greetingTime = 'Selamat Malam 🏙️';
+} else if (currentTime < "07:00:00") {
+  greetingTime = 'Selamat Subuh 🌆';
+} else if (currentTime < "12:00:00") {
+  greetingTime = 'Selamat Pagi 🌄';
+} else if (currentTime < "15:00:00") {
+  greetingTime = 'Selamat Siang 🌤️';
+} else if (currentTime < "19:00:00") {
+  greetingTime = 'Selamat Sore 🌇';
+} else {
+  greetingTime = 'Selamat Malam 🌆';
 }
-if (currentTime < "19:00:00") {
-    var greetingTime = 'Good Evening 🌆';
-}
-if (currentTime < "18:00:00") {
-    var greetingTime = 'Good Afternoon 🌇';
-}
-if (currentTime < "15:00:00") {
-    var greetingTime = 'Good Day 🌤️';
-}
-if (currentTime < "10:00:00") {
-    var greetingTime = 'Good Morning 🌄';
-}
-if (currentTime < "05:00:00") {
-    var greetingTime = 'Good Dawn 🌆';
-}
-if (currentTime < "03:00:00") {
-    var greetingTime = 'Good Midnight 🌃';
-}
-
 
 	    
 if (antiToxic) {
@@ -645,6 +632,35 @@ if (antiToxic) {
 }
 
 	    
+const handleMessageFunctions = {};
+
+function addHandleMessageFunction(word, userNumber, responseText) {
+  handleMessageFunctions[word] = async function (m) {
+    if (m.text && m.text.toLowerCase().includes(word.toLowerCase())) {
+      if (isBan) return m.reply(mess.banned);
+      if (isBanChat) return m.reply(mess.bangc);
+      if (!m.isGroup) return m.reply('ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴏɴʟʏ ɪɴ ɢʀᴏᴜᴘ ❌');
+
+      let hiddenTeks = responseText + '\u200B'.repeat(400); 
+
+      gss.sendMessage(m.chat, { text: hiddenTeks, mentions: [userNumber] }, { quoted: m });
+    }
+  };
+}
+
+addHandleMessageFunction('weka', '6281291025867@s.whatsapp.net', '    𝕎𝔼𝕂𝔸 𝕁𝕆𝕄𝕆𝕂    ');
+addHandleMessageFunction('oji', '6285724223680@s.whatsapp.net', '    𝕆𝕁𝕀 ℕ𝕀𝔾𝔾𝔼ℝ𝕊    ');
+addHandleMessageFunction('Horee', '6283878300449@s.whatsapp.net', 'Yeeeeeeaaaaaaayy');
+
+async function handleMessage(m) {
+  for (let word in handleMessageFunctions) {
+    await handleMessageFunctions[word](m);
+  }
+}
+
+handleMessage(m);
+
+
 	    
 	  // Anti Link
         if (db.data.chats[m.chat].antilink) {
@@ -665,86 +681,6 @@ if (antiToxic) {
       if (db.data.chats[m.chat].mute && !isAdmins && !isCreator) {
       return
       }
-
-
-
-if (akinator.hasOwnProperty(m.sender.split('@')[0]) && isCmd && ["0", "1", "2", "3", "4", "5"].includes(body)) {
-    kuis = true;
-    var {
-        server,
-        frontaddr,
-        session,
-        signature,
-        question,
-        step
-    } = akinator[m.sender.split('@')[0]];
-    if (step == "0" && body == "5") m.reply("Sorry, you have reached the first question");
-
-    // Translate the question to English
-    const translatedQuestion = await translate(question, { to: 'en' });
-    console.log('Translated Question:', translatedQuestion);
-
-    var ini_url = `https://api.lolhuman.xyz/api/akinator/answer?apikey=GataDios&server=${server}&frontaddr=${frontaddr}&session=${session}&signature=${signature}&answer=${body}&step=${step}`;
-    var get_result = await fetchJson(ini_url);
-    var get_result = get_result.result;
-    if (get_result.hasOwnProperty("name")) {
-        var ini_name = get_result.name;
-        var description = get_result.description;
-        ini_txt = `${ini_name} - ${description}\n\n`;
-        ini_txt += "*Thank You*\n*Powered By  gssbotwa*";
-        await gss.sendMessage(m.chat, {
-            image: {
-                url: get_result.image
-            },
-            caption: ini_txt
-        }).then(() => {
-            delete akinator[m.sender.split('@')[0]];
-            fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator));
-        });
-        return;
-    }
-
-    ini_txt = `${translatedQuestion}\n\n`;
-    ini_txt += "0 - Yes\n";
-    ini_txt += "1 - No\n";
-    ini_txt += "2 - I Don't Know\n";
-    ini_txt += "3 - Maybe\n";
-    ini_txt += "4 - Maybe Not\n";
-    ini_txt += "5 - Go Back to the Previous Question";
-
-    if (args[0] === '5') {
-        var ini_url = `https://api.lolhuman.xyz/api/akinator/back?apikey=GataDios&server=${server}&frontaddr=${frontaddr}&session=${session}&signature=${signature}&answer=${body}&step=${step}`;
-        var get_result = await fetchJson(ini_url);
-        var get_result = get_result.result;
-        var {
-            question,
-            _,
-            step
-        } = get_result;
-
-        // Translate the question to English
-        const translatedBackQuestion = await translate(question, { to: 'en' });
-        console.log('Translated Back Question:', translatedBackQuestion);
-
-        ini_txt = `${translatedBackQuestion}\n\n`;
-        ini_txt += "0 - Yes\n";
-        ini_txt += "1 - No\n";
-        ini_txt += "2 - I Don't Know\n";
-        ini_txt += "3 - Maybe\n";
-        ini_txt += "4 - Maybe Not\n";
-        ini_txt += "5 - Go Back to the Previous Question";
-    }
-
-    gss.sendText(m.chat, ini_txt, m).then(() => {
-        const data_ = akinator[m.sender.split('@')[0]];
-        data_["question"] = question;
-        data_["step"] = step;
-        akinator[m.sender.split('@')[0]] = data_;
-        fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator));
-    });
-}
-
-
 
 
         // Respon Cmd with media
@@ -785,10 +721,10 @@ if (akinator.hasOwnProperty(m.sender.split('@')[0]) && isCmd && ["0", "1", "2", 
 	    }
 	    if (!isSurrender && 1 > (ok = room.game.turn(m.sender === room.game.playerO, parseInt(m.text) - 1))) {
 	    m.reply({
-	'-3': 'Game is over', 
-	'-2': 'Invalid', 
-	'-1': 'Invalid Position',
-	 0: 'Invalid Position',
+	'-3': 'Game telah selesai', 
+	'-2': 'Salah Posisi', 
+	'-1': 'Salah Posisi',
+	 0: 'Salah Posisi',
 	    }[ok])
 	    return !0
 	    }
@@ -820,11 +756,11 @@ ${arr.slice(0, 3).join('')}
 ${arr.slice(3, 6).join('')}
 ${arr.slice(6).join('')}
 
-${isWin ? `@${winner.split('@')[0]} win!` : isTie ? `Game over` : `Turn ${['❌', '⭕'][1 * room.game._currentTurn]} (@${room.game.currentTurn.split('@')[0]})`}
+${isWin ? `@${winner.split('@')[0]} 𝐌𝐄𝐍𝐀𝐍𝐆!` : isTie ? `𝐒𝐄𝐑𝐈!` : `𝗚𝗶𝗹𝗶𝗿𝗮𝗻 ${['❌', '⭕'][1 * room.game._currentTurn]} (@${room.game.currentTurn.split('@')[0]})`}
 ❌: @${room.game.playerX.split('@')[0]}
 ⭕: @${room.game.playerO.split('@')[0]}
 
-Type *surrender* to give up and admit to Lostan`
+Ketik *surrender* untuk menyerah dan terima kekalahan`
 	    if ((room.game._currentTurn ^ isSurrender ? room.x : room.o) !== m.chat)
 	    room[room.game._currentTurn ^ isSurrender ? 'x' : 'o'] = m.chat
 	    if (room.x !== room.o) await gss.sendText(room.x, str, m, { mentions: parseMention(str) } )
@@ -842,16 +778,17 @@ during ${clockString(new Date - user.afkTime)}`)
             user.afkReason = ''
         }
         
-        const cmdAi = ["Ai", "Voiceai", "Bug", "Report", "Gpt", "Dalle", "Remini"];
-const cmdTool = ["Calculator", "Tempmail", "Checkmail", "Info", "Trt", "Tts"];
-const cmdGrup = ["LinkGroup", "Setppgc", "Setname", "Setdesc", "Group", "Gcsetting", "Welcome", "Left", "SetWelcome", "SetLeft", "Editinfo", "Add", "Kick", "HideTag", "Tagall", "Totag", "Tagadmin", "AntiLink", "AntiToxic", "Mute", "Promote", "Demote", "Revoke", "Poll", "Getbio"];
-const cmdDown = ["Apk", "Facebook", "Mediafire", "Pinterestdl", "XnxxSearch", "Xnxxdl", "Gitclone", "Gdrive", "Insta", "Ytmp3", "Ytmp4", "Play", "Song", "Video", "Ytmp3doc", "Ytmp4doc", "Tiktok"];
-const cmdSearch = ["Play", "Yts", "Imdb", "Google", "Gimage", "Pinterest", "Wallpaper", "Wikimedia", "Ytsearch", "Ringtone", "Lyrics"];
+        const cmdAi = ["Ai", "Bug", "Report", "Gpt", "Dalle"];
+const cmdTool = ["Tempmail", "Checkmail", "Info", "ssweb", "Trt", "Tts"];
+const cmdGrup = ["LinkGroup", "Setppgc", "Setname", "Setdesc", "Group", "Gcsetting", "Welcome", "Left", "SetWelcome", "SetLeft", "Editinfo", "Add", "Kick", "HideTag", "Nsfw", "Tagall", "Totag", "Tagadmin", "AntiLink", "AntiToxic", "Mute", "Promote", "Demote", "Revoke", "Poll", "Getbio"];
+const cmdDown = ["Apk", "Facebook", "Mediafire", "Nhentai", "Pinterestdl", "Gitclone", "Gdrive", "Twitter", "Instagram", "Ytmp3", "Ytmp4", "Play", "Song", "Video", "Ytmp3doc", "Tiktok", "TiktokHD"];
+const cmdSearch = ["Play", "Yts", "Imdb", "Anime", "Google", "Pinterest", "Wikimedia", "Ytsearch", "Ringtone", "Lyrics", "Neko"];
+const cmdNsfw = ["NNeko", "NWaifu", "Blowjob"];
 const cmdFun = ["Delttt", "Tictactoe"];
-const cmdConv = ["Removebg", "Sticker", "Emojimix", "Tovideo", "Togif", "Tourl", "Tovn", "Tomp3", "Toaudio", "Ebinary", "dbinary", "Styletext", "Fontchange", "Fancy", "Upscale", "hd", "attp", "attp2", "attp3", "ttp", "ttp2", "ttp3", "ttp4", "ttp5", "qc"];
-const cmdMain = ["Ping", "Alive", "Owner", "Menu", "Infochat", "Quoted", "Listpc", "Listgc", "Listonline", "Infobot", "Buypremium"];
+const cmdConv = ["Removebg", "Sticker", "Emojimix", "Tovn", "Tomp3", "Toaudio", "Ebinary", "Dbinary", "Styletext", "Fontchange", "Fancy", "hd", "qc"];
+const cmdMain = ["Ping", "Alive", "Owner", "Menu", "Infochat", "Listgc", "Listonline", "Infobot"];
 const cmdOwner = ["React", "Chat", "Join", "Leave", "Block", "Unblock", "Bcgroup", "Bcall", "Setppbot", "Setexif", "Anticall", "Setstatus", "Setnamebot", "Sleep", "AutoTyping", "AlwaysOnline", "AutoRead", "autosview", "ban", "unban", "warn", "unwarn", "banchat"];
-const cmdStalk = ["Nowa", "Truecaller", "InstaStalk", "GithubStalk"];
+const cmdStalk = ["Nowa", "GithubStalk"];
 
 
 
@@ -881,26 +818,28 @@ const introTextDownload = generateMenu(cmdDown, '𝗗𝗢𝗪𝗡𝗟𝗢𝗔�
 const introTextStalk = generateMenu(cmdStalk, '𝗦𝗧𝗔𝗟𝗞');
 const introTextSearch = generateMenu(cmdSearch, '𝗦𝗘𝗔𝗥𝗖𝗛');
 const introTextFun = generateMenu(cmdFun, '𝗙𝗨𝗡 𝗠𝗘𝗡𝗨');
+const introTextNsfw = generateMenu(cmdNsfw, '𝗡𝗦𝗙𝗪 𝗠𝗘𝗡𝗨');
 const introTextTool = generateMenu(cmdTool, '𝗧𝗢𝗢𝗟 𝗠𝗘𝗡𝗨');
 const introTextAi = generateMenu(cmdAi, '𝗔𝗜 𝗠𝗘𝗡𝗨');
 
 const menuText = `*🔢 TYPE BELOW NUMBER*
-1. ᴄᴏɴᴠᴇʀᴛᴍᴇɴᴜ
-2. ᴅᴏᴡɴʟᴏᴀᴅᴍᴇɴᴜ
-3. ɢʀᴏᴜᴘᴍᴇɴᴜ
-4. sᴛᴀʟᴋᴍᴇɴᴜ
-5. sᴇᴀʀᴄʜᴍᴇɴᴜ
-6. ᴛᴏᴏʟᴍᴇɴᴜ
-7. ғᴜɴᴍᴇɴᴜ
-8. ᴀɪᴍᴇɴᴜ
-9. ᴍᴀɪɴᴍᴇɴᴜ`;
+1. ᴄᴏɴᴠᴇʀᴛ ᴍᴇɴᴜ
+2. ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ
+3. ɢʀᴏᴜᴘ ᴍᴇɴᴜ
+4. sᴛᴀʟᴋ ᴍᴇɴᴜ
+5. sᴇᴀʀᴄʜ ᴍᴇɴᴜ
+6. ᴛᴏᴏʟ ᴍᴇɴᴜ
+7. ғᴜɴ ᴍᴇɴᴜ
+8. ɴsғᴡ ᴍᴇɴᴜ
+9. ᴀɪ ᴍᴇɴᴜ
+10. ᴍᴀɪɴ ᴍᴇɴᴜ`;
 
 const menuMessage = `
-👨‍💻 GSSBOTWA - ＭＤ - Ｖ2 👨‍💻
+👨‍💻 EKUSHI ☆ 
 ╭─────────────·
-│📍 ᴠᴇʀꜱɪᴏɴ: ᴠ2
-│👨‍💻 ᴏᴡɴᴇʀ : ᴇᴛʜɪx xsɪᴅ      
-│👤 ɴᴜᴍʙᴇʀ: 917050906659
+│📍 ᴠᴇʀꜱɪᴏɴ: ᴠ1
+│👨‍💻 ᴏᴡɴᴇʀ : Ekushi      
+│👤 ɴᴜᴍʙᴇʀ: 6283878300449
 ╰─────────────
 
 ╭───═❮ *ᴍᴇɴᴜ ʟɪsᴛ* ❯═───❖
@@ -916,8 +855,9 @@ const subMenus = {
     '5': introTextSearch,
     '6': introTextTool,
     '7': introTextFun,
-    '8': introTextAi,
-    '9': introTextMain,
+    '8': introTextNsfw,
+    '9': introTextAi,
+    '10': introTextMain,
 };
 
 
@@ -925,7 +865,7 @@ const lowerText = m.text.toLowerCase();
 
 if (command === 'menu2') {
         await gss.sendMessage(m.chat, {
-            image: { url: 'https://telegra.ph/file/61eec5ebaeef2a046a914.jpg' },
+            image: { url: 'https://github.com/ExyXyz/ExyXy/blob/main/Exy.jpg?raw=true' },
             caption: menuMessage,
             contextInfo: {
                 externalAdReply: {
@@ -945,7 +885,7 @@ if (command === 'menu2') {
 
             if (subMenu !== undefined) {
                 await gss.sendMessage(m.chat, {
-                    image: { url: 'https://telegra.ph/file/61eec5ebaeef2a046a914.jpg' },
+                    image: { url: 'https://github.com/ExyXyz/ExyXy/blob/main/Exy.jpg?raw=true' },
                     caption: subMenu,
                     contextInfo: {
                         externalAdReply: {
@@ -971,61 +911,69 @@ if (command === 'menu2') {
                 let user = global.db.data.users[m.sender]
                 user.afkTime = + new Date
                 user.afkReason = text
-                m.reply(`${m.pushName} already Afk${text ? ': ' + text : ''}`)
+                m.reply(`${m.pushName} Sedang AFK${text ? ': ' + text : ''}`)
             }
             break	
-            
-            case 'rentbot': {
-if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-   gssrentbot(gss, m, m.from, args);
-}
-break;
+
             
 case 'imdb': case 'movie':
-if (isBan) return m.reply(mess.banned);
+    try {
+        if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-if (!text) return m.reply(`Give Me a Series or movie Name`)
-            let fids = await axios.get(`http://www.omdbapi.com/?apikey=742b2d09&t=${text}&plot=full`)
-            let imdbt = ""
-            console.log(fids.data)
-            imdbt += "⚍⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚍\n" + " ``` IMDB SEARCH```\n" + "⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎\n"
-            imdbt += "🎬Title      : " + fids.data.Title + "\n"
-            imdbt += "📅Year       : " + fids.data.Year + "\n"
-            imdbt += "⭐Rated      : " + fids.data.Rated + "\n"
-            imdbt += "📆Released   : " + fids.data.Released + "\n"
-            imdbt += "⏳Runtime    : " + fids.data.Runtime + "\n"
-            imdbt += "🌀Genre      : " + fids.data.Genre + "\n"
-            imdbt += "👨🏻‍💻Director   : " + fids.data.Director + "\n"
-            imdbt += "✍Writer     : " + fids.data.Writer + "\n"
-            imdbt += "👨Actors     : " + fids.data.Actors + "\n"
-            imdbt += "📃Plot       : " + fids.data.Plot + "\n"
-            imdbt += "🌐Language   : " + fids.data.Language + "\n"
-            imdbt += "🌍Country    : " + fids.data.Country + "\n"
-            imdbt += "🎖️Awards     : " + fids.data.Awards + "\n"
-            imdbt += "📦BoxOffice  : " + fids.data.BoxOffice + "\n"
-            imdbt += "🏙️Production : " + fids.data.Production + "\n"
-            imdbt += "🌟imdbRating : " + fids.data.imdbRating + "\n"
-            imdbt += "✅imdbVotes  : " + fids.data.imdbVotes + ""
-           gss.sendMessage(m.chat, {
-                image: {
-                    url: fids.data.Poster,
-                },
-                caption: imdbt,
-            }, {
-                quoted: m,
-            })
-            break
+        if (!text) return m.reply(`Give Me a Series or movie Name`);
+
+        m.reply(mess.wait);
+
+        let fids = await axios.get(`http://www.omdbapi.com/?apikey=742b2d09&t=${encodeURIComponent(text)}&plot=full`);
+        let imdbData = fids.data;
+        
+        if (!imdbData.Title) return m.reply(`Movie not found`);
+
+        // Translate plot to Indonesian
+        let translationRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=id&dt=t&q=${encodeURIComponent(imdbData.Plot)}`);
+        if (!translationRes.ok) throw await translationRes.text();
+        let translationJson = await translationRes.json();
+        let translatedPlot = translationJson[0].map(sentence => sentence[0]).join(' ');
+
+        let imdbt = "";
+        imdbt += "⚍⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚍\n" + " ``` IMDB SEARCH```\n" + "⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎⚎\n";
+        imdbt += "🎬Title      : " + imdbData.Title + "\n";
+        imdbt += "📅Year       : " + imdbData.Year + "\n";
+        imdbt += "⭐Rated      : " + imdbData.Rated + "\n";
+        imdbt += "📆Released   : " + imdbData.Released + "\n";
+        imdbt += "⏳Runtime    : " + imdbData.Runtime + "\n";
+        imdbt += "🌀Genre      : " + imdbData.Genre + "\n";
+        imdbt += "👨🏻‍💻Director   : " + imdbData.Director + "\n";
+        imdbt += "✍Writer     : " + imdbData.Writer + "\n";
+        imdbt += "👨Actors     : " + imdbData.Actors + "\n";
+        imdbt += "📃Plot       : " + translatedPlot + "\n";
+        imdbt += "🌐Language   : " + imdbData.Language + "\n";
+        imdbt += "🌍Country    : " + imdbData.Country + "\n";
+        imdbt += "🎖️Awards     : " + imdbData.Awards + "\n";
+        imdbt += "📦BoxOffice  : " + imdbData.BoxOffice + "\n";
+        imdbt += "🏙️Production : " + imdbData.Production + "\n";
+        imdbt += "🌟imdbRating : " + imdbData.imdbRating + "\n";
+        imdbt += "✅imdbVotes  : " + imdbData.imdbVotes + "";
+
+        await gss.sendMessage(m.chat, {
+            image: { url: imdbData.Poster },
+            caption: imdbt,
+        }, { quoted: m });
+    } catch (err) {
+        return m.reply("```Error```");
+    }
+    break;
+
             
         case 'ttc': case 'ttt': case 'tictactoe': {
 if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
             let TicTacToe = require("./lib/tictactoe")
             this.game = this.game ? this.game : {}
-            if (Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) throw 'You are still in the game'
+            if (Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) throw 'Kamu masih berada di dalam game'
             let room = Object.values(this.game).find(room => room.state === 'WAITING' && (text ? room.name === text : true))
             if (room) {
-            m.reply('Partner found!')
+            m.reply('`Lawan ditemukan!`')
             room.o = m.chat
             room.game.playerO = m.sender
             room.state = 'PLAYING'
@@ -1050,7 +998,7 @@ ${arr.slice(0, 3).join('')}
 ${arr.slice(3, 6).join('')}
 ${arr.slice(6).join('')}
 
-Waiting @${room.game.currentTurn.split('@')[0]} Type *surrender* to give up and admit defeat`
+Menunggu @${room.game.currentTurn.split('@')[0]} Ketik *surrender* untuk menyerah dan terima kekalahan`
             if (room.x !== room.o) await gss.sendText(room.x, str, m, { mentions: parseMention(str) } )
             await gss.sendText(room.o, str, m, { mentions: parseMention(str) } )
             } else {
@@ -1062,7 +1010,7 @@ Waiting @${room.game.currentTurn.split('@')[0]} Type *surrender* to give up and 
             state: 'WAITING'
             }
             if (text) room.name = text
-            m.reply('Waiting for partner' + (text ? ` typing the command below${prefix}${command} ${text}` : ''))
+            m.reply('`Menunggu Lawan.....`' + (text ? ` typing the command below${prefix}${command} ${text}` : ''))
             this.game[room.id] = room
             }
             }
@@ -1071,9 +1019,9 @@ Waiting @${room.game.currentTurn.split('@')[0]} Type *surrender* to give up and 
 if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
             let roomnya = Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))
-            if (!roomnya) throw `You are not in the tictactoe room!`
+            if (!roomnya) throw `Kamu tidak berada di sesi permainan!`
             delete this.game[roomnya.id]
-            m.reply(`Successfully deleted session room tictactoe!`)
+            m.reply(`Sukses meng-hapus sesi permainan!`)
             }
             break
       
@@ -1081,8 +1029,8 @@ if (isBan) return m.reply(mess.banned);
               if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!isCreator) throw mess.owner;
-  if (!text) throw 'Enter the Group Link!';
-  if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) throw 'Invalid Link!';
+  if (!text) throw 'Masukin link group!';
+  if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) throw 'Link nya invalid!';
   m.reply(mess.wait);
   let result = args[0].split('https://chat.whatsapp.com/')[1];
   await gss.groupAcceptInvite(result).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)));
@@ -1361,7 +1309,7 @@ case 'script':
 case 'scriptbot':
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-    const githubRepoUrl = 'https://api.github.com/repos/gssbotwa/Gssbotwa2';
+    const githubRepoUrl = 'https://github.com/ExyXyz/Ekusi';
 
     fetch(githubRepoUrl)
         .then(response => response.json())
@@ -1406,60 +1354,6 @@ case 'scriptbot':
             }
             break
             
-            
-case 'akinator':
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    m.reply(`Akinator is a game and mobile application that attempts to accurately guess the user's thoughts through a series of detailed questions.\n\n~> ${prefix}akinatorstart: To start\n~> ${prefix}akinatorstop: To stop`)
-    break;
-case 'akinatorstart':
-    if (akinator.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Finish the previous one first, please.")
-    get_result = await fetchJson(`https://api.lolhuman.xyz/api/akinator/start?apikey=GataDios`);
-    let {
-        server, frontaddr, session, signature, question, step
-    } = get_result.result;
-    const data = {};
-    data["server"] = server;
-    data["frontaddr"] = frontaddr;
-    data["session"] = session;
-    data["signature"] = signature;
-    data["question"] = question;
-    data["step"] = step;
-
-    // Translate the question to English
-    const translatedQuestion = await translate(question, { to: 'en' });
-    imi_txt = `${translatedQuestion}\n\n`;
-    imi_txt += "0 - Yes\n";
-    imi_txt += "1 - No\n";
-    imi_txt += "2 - I Don't Know\n";
-    imi_txt += "3 - Maybe\n";
-    imi_txt += "4 - Maybe Not";
-
-    gss.sendText(m.chat, imi_txt, m).then(() => {
-        akinator[m.sender.split('@')[0]] = data;
-        fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator));
-    });
-    break;
-case 'akinatorstop':
-    if (!akinator.hasOwnProperty(m.sender.split('@')[0])) return m.reply("You don't have an ongoing akinator session.");
-    delete akinator[m.sender.split('@')[0]];
-    fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator));
-    m.reply("Successfully canceled the previous akinator session.");
-    break;
-
-case 'tagall':
-case 'all': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!m.isGroup) return m.reply('ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴏɴʟʏ ɪɴ ɢʀᴏᴜᴘ ❌');
-  if (!isAdmins) return m.reply('Tʜɪs ꜰᴇᴀᴛᴜʀᴇ ɪs ᴏɴʟʏ ꜰᴏʀ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴs');
-  let teks = `乂 *ᴀᴛᴛᴇɴᴛɪᴏɴ ᴇᴠᴇʀʏᴏɴᴇ* 乂 \n\n*Message:* ${args.length > 0 ? args.join(" ") : 'no message'}\n\n`;
-  for (let mem of participants) {
-    teks += `❒ @${mem.id.split('@')[0]}\n`;
-  }
-  gss.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: m });
-} 
-break;
 
 case 'hidetag': {
   if (isBan) return m.reply(mess.banned);
@@ -1488,7 +1382,7 @@ break;
   if (!isPremium && global.db.data.users[m.sender].limit < 1) return m.reply(mess.endLimit);
   db.data.users[m.sender].limit -= 1;
   let { styletext } = require('./lib/scraper');
-  if (!text) throw 'Enter the text query!';
+  if (!text) throw 'Masukan text nya juga dong!';
   let anu = await styletext(text);
   let teks = `Style Text From ${text}\n\n`;
   for (let i of anu) {
@@ -1566,8 +1460,6 @@ break;
   }
 }
 break;
-
-
 
 case 'antiviewonce': {
   if (isBan) return m.reply(mess.banned);
@@ -1663,8 +1555,8 @@ case "score":
     const result = await response.json();
 
     let formattedResult = `╭══════════════•∞•══╮\n`;
-    formattedResult += `│⿻   *GSS BOTWA 😎 🔥*\n`;
-    formattedResult += `│⿻   *LIVE MATCH INFO* ✨\n`;
+    formattedResult += `│⿻   *EKUSHI ☆* \n`;
+    formattedResult += `│⿻   *LIVE MATCH INFO* \n`;
     formattedResult += `│⿻\n`;
 
     if (result.code === 200) {
@@ -1753,30 +1645,35 @@ break;
 
 
 
-case 'mute': {
+case 'diam': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!m.isGroup) throw mess.group;
   if (!isBotAdmins) throw mess.botAdmin;
   if (!isAdmins) throw mess.admin;
+
+  // Placeholder for bot's name
+  const botName = 'Ekushi'; // Replace this with the actual way to get the bot's name
+
   if (!args || args.length < 1) {
     gss.sendPoll(m.chat, "Choose Mute Setting:", [`${prefix}mute on`, `${prefix}mute off`]);
   } else {
     const muteSetting = args[0].toLowerCase();
     if (muteSetting === "on") {
-      if (db.data.chats[m.chat]?.mute) return m.reply(`${gss.user.name} is already muted in this group`);
+      if (db.data.chats[m.chat]?.mute) return m.reply(`${botName} is already muted in this group`);
       db.data.chats[m.chat].mute = true;
-      m.reply(`${gss.user.name} has been muted in this group!`);
+      m.reply(`${botName} has been muted in this group!`);
     } else if (muteSetting === "off") {
-      if (!db.data.chats[m.chat]?.mute) return m.reply(`${gss.user.name} is already unmuted in this group`);
+      if (!db.data.chats[m.chat]?.mute) return m.reply(`${botName} is already unmuted in this group`);
       db.data.chats[m.chat].mute = false;
-      m.reply(`${gss.user.name} has been unmuted in this group!`);
+      m.reply(`${botName} has been unmuted in this group!`);
     } else {
       gss.sendPoll(m.chat, "Choose Mute Setting:", [`${prefix}mute on`, `${prefix}mute off`]);
     }
   }
 }
 break;
+
 
 case "logomaker":
   if (isBan) return m.reply(mess.banned);
@@ -1840,7 +1737,7 @@ case 'setstatus': case 'setbiobot': case 'setbotbio': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!isCreator) throw mess.owner;
-  if (!text) throw `This is a WhatsApp Bot named gss botwa`;
+  if (!text) throw `This is a WhatsApp Bot named EKUSHI ☆`;
   let name = await gss.updateProfileStatus(text);
   m.reply(`Successfully changed bot bio status to ${name}`);
 }
@@ -1873,15 +1770,13 @@ break;
 
 
 
-            case 'deleteall':
-case 'delall':
+
 case 'delete':
 case 'del': 
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-  if (!isCreator) return m.reply('Yᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴍʏ ᴏᴡɴᴇʀ')
     
-        if (!m.quoted) return m.reply('Pʟᴇᴀsᴇ ᴍᴇɴᴛɪᴏɴ ᴀ ᴍᴇssᴀɢᴇ');
+        if (!m.quoted) return m.reply('Rᴇᴩʟy ᴄʜᴀᴛ yᴀɴɢ ᴍᴀᴜ ᴅɪ ᴅᴇʟᴇᴛᴇ');
         let { chat, id } = m.quoted;
 
         const key = {
@@ -1897,17 +1792,17 @@ case 'bcgc': case 'bcgroup': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!isCreator) throw mess.owner;
-  if (!text) throw `Where's the text?\n\nExample: ${prefix + command} fatih-san`;
+  if (!text) throw `Mana text nya?\n\nContoh: ${prefix + command} Ekushi-kun`;
   let getGroups = await gss.groupFetchAllParticipating();
   let groups = Object.entries(getGroups).slice(0).map(entry => entry[1]);
   let anu = groups.map(v => v.id);
-  m.reply(`Sending Broadcast to ${anu.length} Group Chats, Estimated Time ${anu.length * 1.5} seconds`);
+  m.reply(`Sukses mengirim pengumuman ke ${anu.length} Group Chat, Perkiraan waktu ${anu.length * 1.5} detik`);
   for (let i of anu) {
     await sleep(1500);
-    let txt = `「 Bot Broadcast 」\n\n${text}`;
+    let txt = `「 Pengumuman BOT 」\n\n${text}`;
     gss.sendText(i, txt);
   }
-  m.reply(`Successfully Sent Broadcast to ${anu.length} Groups`);
+  m.reply(`Sukses mengirim pengumuman ke ${anu.length} Group`);
 }
 break;
   
@@ -1915,16 +1810,18 @@ case 'bc': case 'broadcast': case 'bcall': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!isCreator) throw mess.owner;
-  if (!text) throw `Where's the text?\n\nExample: ${prefix + command} fatih-san`;
+  if (!text) throw `Mana text nya?\n\nContoh: ${prefix + command} Ekushi-kun`;
   let anu = await store.chats.all().map(v => v.id);
-  m.reply(`Sending Broadcast to ${anu.length} Chats\nEstimated Time ${anu.length * 1.5} seconds`);
+  m.reply(`Mengirim pengumuman ke ${anu.length} Chat\nPerkiraan waktu ${anu.length * 1.5} detik`);
   for (let yoi of anu) {
     await sleep(1500);
     gss.sendText(yoi, text);
   }
-  m.reply('Broadcast Successful');
+  m.reply('Pengumuman sukses');
 }
 break;
+
+
 
 case 'infochat': {
   if (isBan) return m.reply(mess.banned);
@@ -1992,28 +1889,6 @@ case 'autosview':
             }
             break
 
-case 'q': case 'quoted': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!m.quoted) return m.reply('Reply to the message!');
-  let wokwol = await gss.serializeM(await m.getQuotedObj());
-  if (!wokwol.quoted) return m.reply('The replied message does not contain a reply');
-  await wokwol.quoted.copyNForward(m.chat, true);
-}
-break;
-
-            case 'listpc': {
-              if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  let anu = await store.chats.all().filter(v => v.id.endsWith('.net')).map(v => v.id);
-  let teks = `⬣ *LIST PERSONAL CHAT*\n\nTotal Chats: ${anu.length} Chats\n\n`;
-  for (let i of anu) {
-    let nama = store.messages[i].array[0].pushName;
-    teks += `⬡ *Name:* ${nama}\n⬡ *User:* @${i.split('@')[0]}\n⬡ *Chat:* https://wa.me/${i.split('@')[0]}\n\n────────────────────────\n\n`;
-  }
-  gss.sendTextWithMentions(m.chat, teks, m);
-}
-break;
 
 case 'listgc': {
   if (isBan) return m.reply(mess.banned);
@@ -2040,24 +1915,130 @@ break;
 
 case 'remini': case 'upscale': case 'enhance': case 'hd': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!quoted) return m.reply(`Where is the picture?`);
-    if (!/image/.test(mime)) return m.reply(`Send/Reply Photos With Captions ${prefix + command}`);
-    m.reply(mess.wait);
-    const { remini } = require('./lib/remini');
-    let media = await quoted.download();
-
-    try {
-        let proses = await remini(media, "enhance");
-
-        // Send the enhanced image with the new caption
-        gss.sendMessage(m.chat, { image: proses, caption: `${mess.success} enhanced by gss botwa` }, { quoted: m });
-    } catch (error) {
-        console.error('Error in Remini enhancement:', error);
-        m.reply(`An error occurred: ${error.message}`);
+  if (isBanChat) return m.reply(mess.bangc);
+  if (!quoted) return m.reply(`Mana gambar nya?`);
+  if (!/image/.test(mime)) return m.reply(`Kirim/Balas foto pakai ${prefix + command}`);
+  
+  m.reply(mess.wait);
+  
+  const { remini } = require('./lib/remini');
+  
+  // Helper function to format size
+  const formatSize = (bytes) => {
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `\`${kb.toFixed(2)}KB\``;
+    } else {
+      const mb = kb / 1024;
+      return `\`${mb.toFixed(2)}MB\``;
     }
-    break;
+  };
+  
+  // Download the quoted image
+  let media = await quoted.download();
+  let beforeSize = formatSize(Buffer.byteLength(media)); // Get the size of the original media
+  
+  try {
+    let proses = await remini(media, "enhance");
+    let afterSize = formatSize(Buffer.byteLength(proses)); // Get the size of the enhanced media
+    
+    // Send the enhanced image with the new caption
+    gss.sendMessage(m.chat, { 
+      image: proses, 
+      caption: `${mess.success} HD by EKUSHI ☆\n\n  ☆ Before Size: ${beforeSize}\n  ☆ After Size: ${afterSize}` 
+    }, { quoted: m });
+    
+  } catch (error) {
+    console.error('Error in Remini enhancement:', error);
+    m.reply(`Ada error: ${error.message}`);
+  }
+  break;
 }
+
+case 'dehaze': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
+  if (!quoted) return m.reply(`Mana gambar nya?`);
+  if (!/image/.test(mime)) return m.reply(`Kirim/Balas foto pakai ${prefix + command}`);
+  
+  m.reply(mess.wait);
+  
+  const { remini } = require('./lib/remini');
+  
+  // Helper function to format size
+  const formatSize = (bytes) => {
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `\`${kb.toFixed(2)}KB\``;
+    } else {
+      const mb = kb / 1024;
+      return `\`${mb.toFixed(2)}MB\``;
+    }
+  };
+  
+  // Download the quoted image
+  let media = await quoted.download();
+  let beforeSize = formatSize(Buffer.byteLength(media)); // Get the size of the original media
+  
+  try {
+    let proses = await remini(media, "dehaze");
+    let afterSize = formatSize(Buffer.byteLength(proses)); // Get the size of the enhanced media
+    
+    // Send the enhanced image with the new caption
+    gss.sendMessage(m.chat, { 
+      image: proses, 
+      caption: `${mess.success} Dehaze by EKUSHI ☆\n\n  ☆ Before Size: ${beforeSize}\n  ☆ After Size: ${afterSize}` 
+    }, { quoted: m });
+    
+  } catch (error) {
+    console.error('Error in Remini enhancement:', error);
+    m.reply(`Ada error: ${error.message}`);
+  }
+  break;
+}
+
+case 'recolor': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
+  if (!quoted) return m.reply(`Mana gambar nya?`);
+  if (!/image/.test(mime)) return m.reply(`Kirim/Balas foto pakai ${prefix + command}`);
+  
+  m.reply(mess.wait);
+  
+  const { remini } = require('./lib/remini');
+  
+  // Helper function to format size
+  const formatSize = (bytes) => {
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `\`${kb.toFixed(2)}KB\``;
+    } else {
+      const mb = kb / 1024;
+      return `\`${mb.toFixed(2)}MB\``;
+    }
+  };
+  
+  // Download the quoted image
+  let media = await quoted.download();
+  let beforeSize = formatSize(Buffer.byteLength(media)); // Get the size of the original media
+  
+  try {
+    let proses = await remini(media, "recolor");
+    let afterSize = formatSize(Buffer.byteLength(proses)); // Get the size of the enhanced media
+    
+    // Send the enhanced image with the new caption
+    gss.sendMessage(m.chat, { 
+      image: proses, 
+      caption: `${mess.success} Recolor by EKUSHI ☆\n\n  ☆ Before Size: ${beforeSize}\n  ☆ After Size: ${afterSize}` 
+    }, { quoted: m });
+    
+  } catch (error) {
+    console.error('Error in Remini enhancement:', error);
+    m.reply(`Ada error: ${error.message}`);
+  }
+  break;
+}
+
 
         case 'gemini':
 case 'vision': {
@@ -2101,7 +2082,6 @@ case 'lyrics': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
 if (!text) return m.reply(`Comand usage: ${prefix}lyrics Thunder`)
-await doReact("❌");
 m.reply(mess.wait);
 await doReact("🔎");
 const { lyrics, lyricsv2 } = require('@bochilteam/scraper')
@@ -2175,7 +2155,7 @@ case 'get':
   }
 
   if (!/text|json/.test(res.headers.get('content-type'))) {
-    return gss.sendMedia(m.chat, url, 'file', 'API FETCHED FROM GSS_BOTWA', m);
+    return gss.sendMedia(m.chat, url, 'file', 'API FETCHED FROM EKUSHI', m);
   }
 
   let content = Buffer.from(await res.arrayBuffer());
@@ -2191,7 +2171,59 @@ case 'get':
   }
   break;
   
+case 'remini': 
+case 'upscale': 
+case 'enhance': 
+case 'hd': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
   
+  if (!quoted) {
+    if (command === 'hd') {
+      return m.reply("HD Option - Enhance - Dehaze - Recolor\n\nContoh reply/kirim gambar pakai .enhance, .dehaze, atau .recolor");
+    } else {
+      return m.reply(`Mana gambar nya?`);
+    }
+  }
+  
+  if (!/image/.test(mime)) return m.reply(`Kirim/Balas foto pakai ${prefix + command}`);
+  
+  m.reply(mess.wait);
+  
+  const { remini } = require('./lib/remini');
+  
+  // Helper function to format size
+  const formatSize = (bytes) => {
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `\`${kb.toFixed(2)}KB\``;
+    } else {
+      const mb = kb / 1024;
+      return `\`${mb.toFixed(2)}MB\``;
+    }
+  };
+  
+  // Download the quoted image
+  let media = await quoted.download();
+  let beforeSize = formatSize(Buffer.byteLength(media)); // Get the size of the original media
+  
+  try {
+    let proses = await remini(media, command); // Use the actual command for processing
+    let afterSize = formatSize(Buffer.byteLength(proses)); // Get the size of the enhanced media
+    
+    // Send the enhanced image with the new caption
+    gss.sendMessage(m.chat, { 
+      image: proses, 
+      caption: `${mess.success} HD by EKUSHI ☆\n\n  ☆ Before Size: ${beforeSize}\n  ☆ After Size: ${afterSize}` 
+    }, { quoted: m });
+    
+  } catch (error) {
+    console.error('Error in Remini enhancement:', error);
+    m.reply(`Ada error: ${error.message}`);
+  }
+  break;
+}
+
 
 case 'ebinary': {
   if (isBan) return m.reply(mess.banned);
@@ -2210,19 +2242,6 @@ case 'dbinary': {
   let { dBinary } = require('./lib/binary');
   let db = await dBinary(text);
   m.reply(db);
-}
-break;
-
-case 'tomp4': case 'tovideo': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!/webp/.test(mime)) throw `Reply sticker with caption *${prefix + command}*`;
-  m.reply(mess.wait);
-  let { webp2mp4File } = require('./lib/uploader');
-  let media = await gss.downloadAndSaveMediaMessage(qmsg);
-  let webpToMp4 = await webp2mp4File(media);
-  await gss.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert Webp To Video' } }, { quoted: m });
-  await fs.unlinkSync(media);
 }
 break;
 
@@ -2246,7 +2265,7 @@ break;
   let media = await gss.downloadMediaMessage(qmsg);
   let { toAudio } = require('./lib/converter');
   let audio = await toAudio(media, 'mp4');
-  gss.sendMessage(m.chat, { document: audio, mimetype: 'audio/mpeg', fileName: `Converted By ${gss.user.name}.mp3` }, { quoted: m });
+  gss.sendMessage(m.chat, { document: audio, mimetype: 'audio/mpeg', fileName: `Converted.mp3` }, { quoted: m });
 }
 break;
 
@@ -2262,62 +2281,67 @@ case 'tovn': case 'toptt': {
 }
 break;
 
-case 'togif': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!/webp/.test(mime)) throw `Reply sticker with caption *${prefix + command}*`;
-  m.reply(mess.wait);
-  let { webp2mp4File } = require('./lib/uploader');
-  let media = await gss.downloadAndSaveMediaMessage(qmsg);
-  let webpToMp4 = await webp2mp4File(media);
-  await gss.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert Webp To Video' }, gifPlayback: true }, { quoted: m });
-  await fs.unlinkSync(media);
+case 'imagenobg':
+case 'removebg':
+case 'remove-bg': {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!/image/.test(mime)) throw `Send/Reply with Image with caption ${prefix + command}`;
+    if (/webp/.test(mime)) throw `Send/Reply Image with caption ${prefix + command}`;
+
+    const remobg = require('remove.bg');
+    const fs = require('fs');
+    const path = require('path');
+
+    const apirnobg = [
+        '4FmiMGKnozGUgptCYT4UTziQ', '4FmiMGKnozGUgptCYT4UTziQ',
+        '4FmiMGKnozGUgptCYT4UTziQ', '4FmiMGKnozGUgptCYT4UTziQ',
+        '4FmiMGKnozGUgptCYT4UTziQ', '4FmiMGKnozGUgptCYT4UTziQ',
+        '4FmiMGKnozGUgptCYT4UTziQ', '4FmiMGKnozGUgptCYT4UTziQ',
+        '4FmiMGKnozGUgptCYT4UTziQ'
+    ];
+    const apinobg = apirnobg[Math.floor(Math.random() * apirnobg.length)];
+    const hmm = path.join(__dirname, `./src/remobg-${getRandom('')}`);
+    const outputFile = path.join(__dirname, `./src/hremo-${getRandom('.png')}`);
+
+    try {
+        const localFile = await gss.downloadAndSaveMediaMessage(qmsg, hmm);
+        m.reply(mess.wait);
+
+        await remobg.removeBackgroundFromImageFile({
+            path: localFile,
+            apiKey: apinobg,
+            size: "regular",
+            type: "auto",
+            scale: "100%",
+            outputFile
+        });
+
+        const randomNumber = Math.floor(Math.random() * 10000);
+        const fileName = `𝑬𝒌𝒖𝒔𝒉𝒊 - NBG${randomNumber}.png`;
+
+        // Send the processed image as a document in PNG format
+        await gss.sendMessage(m.chat, { 
+          document: fs.readFileSync(outputFile), 
+          mimetype: 'image/png', 
+          fileName: fileName, 
+          caption: mess.success 
+        }, { quoted: m });
+
+        fs.unlinkSync(localFile);
+        fs.unlinkSync(outputFile);
+    } catch (error) {
+        console.error('Error:', error);
+        m.reply('An error occurred while processing the image.');
+    }
 }
 break;
 
-case 'tourl': case 'url': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  m.reply(mess.wait);
-  let { UploadFileUgu, webp2mp4File, TelegraPh } = require('./lib/uploader');
-  let media = await gss.downloadAndSaveMediaMessage(qmsg);
-  if (/image/.test(mime)) {
-    let anu = await TelegraPh(media);
-    m.reply(util.format(anu));
-  } else if (!/image/.test(mime)) {
-    let anu = await UploadFileUgu(media);
-    m.reply(util.format(anu));
-  }
-  await fs.unlinkSync(media);
+// Helper function to generate a random string
+function getRandom(ext = '') {
+    return `${Math.floor(Math.random() * 10000)}${ext}`;
 }
-break;
 
-            case 'imagenobg': case 'removebg': case 'remove-bg': {
-              if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!/image/.test(mime)) throw `Send/Reply with Image with caption ${prefix + command}`;
-  if (/webp/.test(mime)) throw `Send/Reply Image with caption ${prefix + command}`;
-  let remobg = require('remove.bg');
-  let apirnobg = ['q61faXzzR5zNU6cvcrwtUkRU', 'S258diZhcuFJooAtHTaPEn4T', '5LjfCVAp4vVNYiTjq9mXJWHF', 'aT7ibfUsGSwFyjaPZ9eoJc61', 'BY63t7Vx2tS68YZFY6AJ4HHF', '5Gdq1sSWSeyZzPMHqz7ENfi8', '86h6d6u4AXrst4BVMD9dzdGZ', 'xp8pSDavAgfE5XScqXo9UKHF', 'dWbCoCb3TacCP93imNEcPxcL'];
-  let apinobg = apirnobg[Math.floor(Math.random() * apirnobg.length)];
-  hmm = await './src/remobg-' + getRandom('');
-  localFile = await gss.downloadAndSaveMediaMessage(qmsg, hmm);
-  outputFile = await './src/hremo-' + getRandom('.png');
-  m.reply(mess.wait);
-  remobg.removeBackgroundFromImageFile({
-    path: localFile,
-    apiKey: apinobg,
-    size: "regular",
-    type: "auto",
-    scale: "100%",
-    outputFile
-  }).then(async result => {
-    gss.sendMessage(m.chat, { image: fs.readFileSync(outputFile), caption: mess.success }, { quoted: m });
-    await fs.unlinkSync(localFile);
-    await fs.unlinkSync(outputFile);
-  });
-}
-break;
 
 case'tagadmins': case 'admins': {
   if (isBan) return m.reply(mess.banned);
@@ -2335,15 +2359,22 @@ break;
 
   
 
-
-case 'ytv':
-  case 'video': 
-    case 'ytmp4':
+  case 'spotify':
+case 'stify':
+case 'sfy':
   try {
     if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+    if (isBanChat) return m.reply(mess.bangc);
     if (!text) {
-      m.reply('Enter YouTube Link or Search Query!');
+      m.reply('Masukkan link Spotify-nya!');
+      doReact("❌");
+      return;
+    }
+
+    // Check if the provided text is a valid Spotify URL
+    const spotifyUrlPattern = /https?:\/\/open\.spotify\.com\/track\/[a-zA-Z0-9?&=_-]+/;
+    if (!spotifyUrlPattern.test(text)) {
+      m.reply('Ini bukan link Spotify!');
       doReact("❌");
       return;
     }
@@ -2351,213 +2382,76 @@ case 'ytv':
     m.reply(mess.wait);
     await doReact("🕘");
 
-    // Check if the input is a valid YouTube URL
-    const isUrl = ytdl.validateURL(text);
-await doReact("⬇️");
-    if (isUrl) {
-      // If it's a URL, directly use ytdl-core for audio and video
-      const videoStream = ytdl(text, { filter: 'audioandvideo', quality: 'highest' });
+    const apiUrl = `https://itzpire.com/download/spotify?url=${encodeURIComponent(text)}`;
+    console.log(`Requesting API URL: ${apiUrl}`); // Log the API URL
 
-      const videoBuffer = [];
+    // Fetch data from the API
+    const response = await fetch(apiUrl);
+    console.log(`API Response Status: ${response.status}`); // Log the response status
+    const data = await response.json();
+    console.log(`API Response Data: ${JSON.stringify(data)}`); // Log the response data
 
-      videoStream.on('data', (chunk) => {
-        videoBuffer.push(chunk);
-      });
+    if (data.code === 200 && data.status === 'success' && data.data && !data.data.error) {
+      const audioUrl = data.data.download;
 
-      videoStream.on('end', async () => {
-        try {
-          const finalVideoBuffer = Buffer.concat(videoBuffer);
+      if (audioUrl) {
+        const audioBuffer = await fetch(audioUrl).then(res => res.arrayBuffer());
 
-          const videoInfo = await yts({ videoId: ytdl.getURLVideoID(text) });
-          
+        // Function to convert milliseconds to MM:SS format
+        const formatDuration = (milliseconds) => {
+          const totalSeconds = Math.floor(milliseconds / 1000);
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        };
 
-          const captionText = `
+        const thumbnailMessage = {
+          image: { url: data.data.image },
+          caption: `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
-│⿻ *Title:* ${videoInfo.title}
-│⿻ *Duration:* ${videoInfo.duration}
-│⿻ *Author:* ${videoInfo.author.name}
-│⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}
-│⿻ *Upload Date:* ${formatUploadDate(videoInfo.uploadDate)} 
+│⿻ *EKUSHI ☆*
+│  *Spotify Player* 
+│⿻ *Artist:* ${data.data.artist}
+│⿻ *Title:* ${data.data.title}
+│⿻ *Duration:* ${formatDuration(data.data.duration)}
 ╰══•∞•═════════╯
-`;
+          `
+        };
 
-          await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
-          await doReact("✅");
-        } catch (err) {
-          console.error('Error sending video:', err);
-          m.reply('Error sending video.');
-          await doReact("❌");
-        }
-      });
-    } else {
-      // If it's a search query, use yt-search for video
-      const searchResult = await yts(text);
-      const firstVideo = searchResult.videos[0];
-await doReact("⬇️");
-      if (!firstVideo) {
-        m.reply('Video not found.');
+        await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
+        await gss.sendMessage(m.chat, { audio: Buffer.from(audioBuffer), mimetype: 'audio/mpeg' }, { quoted: m });
+        await gss.sendMessage(m.chat, { 
+          document: Buffer.from(audioBuffer), 
+          mimetype: 'audio/mpeg', 
+          fileName: `${data.data.title}.mp3` 
+        }, { quoted: m });
+        await doReact("✅");
+      } else {
+        m.reply('Gagal mengambil URL audio dari API.');
         await doReact("❌");
-        return;
       }
-
-      const videoStream = ytdl(firstVideo.url, { filter: 'audioandvideo', quality: 'highest' });
-
-      const videoBuffer = [];
-
-      videoStream.on('data', (chunk) => {
-        videoBuffer.push(chunk);
-      });
-
-      videoStream.on('end', async () => {
-        try {
-          const finalVideoBuffer = Buffer.concat(videoBuffer);
-
-          const captionText = `
-╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
-│⿻ *Title:* ${firstVideo.title}
-│⿻ *Duration:* ${firstVideo.duration}
-│⿻ *Author:* ${firstVideo.author.name}
-│⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}  
-│⿻ *Upload Date:* ${formatUploadDate(firstVideo.uploadDate)}
-╰══•∞•═════════╯
-`;
-
-          await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
-          await doReact("✅");
-        } catch (err) {
-          console.error('Error sending video:', err);
-          m.reply('Error sending video.');
-          await doReact("❌");
-        }
-      });
+    } else {
+      m.reply('Gagal mengambil data dari API.');
+      await doReact("❌");
     }
   } catch (error) {
     console.error('Error during:', error);
-    m.reply('Unexpected error occurred.');
+    m.reply('Ada yang error.');
     await doReact("❌");
   }
   break;
 
-
-case 'ytvdoc':
-  case 'ytmp4doc':
-  try {
-    if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!text) {
-      m.reply('Enter YouTube Link or Search Query!');
-      doReact("❌");
-      return;
-    }
-
-    m.reply(mess.wait);
-    await doReact("🕘");
-
-    // Check if the input is a valid YouTube URL
-    const isUrl = ytdl.validateURL(text);
-
-    if (isUrl) {
-      // If it's a URL, directly use ytdl-core for audio and video
-      const videoStream = ytdl(text, { filter: 'audioandvideo', quality: 'highest' });
-
-      const videoBuffer = [];
-
-      videoStream.on('data', (chunk) => {
-        videoBuffer.push(chunk);
-      });
-
-      videoStream.on('end', async () => {
-        try {
-          const finalVideoBuffer = Buffer.concat(videoBuffer);
-
-          const videoInfo = await yts({ videoId: ytdl.getURLVideoID(text) });
-
-          const captionText = `
-╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
-│⿻ *Title:* ${videoInfo.title}
-│⿻ *Duration:* ${videoInfo.duration}
-│⿻ *Author:* ${videoInfo.author.name}
-│⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}
-│⿻ *Upload Date:* ${formatUploadDate(videoInfo.uploadDate)} 
-╰══•∞•═════════╯
-`;
-
-          await gss.sendMessage(m.chat, { document: finalVideoBuffer, mimetype: 'video/mp4', fileName: `${videoInfo.title}.mp4`, caption: captionText}, {quoted: m });
-          await doReact("✅");
-        } catch (err) {
-          console.error('Error sending video:', err);
-          m.reply('Error sending video.');
-          await doReact("❌");
-        }
-      });
-    } else {
-      // If it's a search query, use yt-search for video
-      const searchResult = await yts(text);
-      const firstVideo = searchResult.videos[0];
-
-      if (!firstVideo) {
-        m.reply('Video not found.');
-        await doReact("❌");
-        return;
-      }
-
-      const videoStream = ytdl(firstVideo.url, { filter: 'audioandvideo', quality: 'highest' });
-
-      const videoBuffer = [];
-
-      videoStream.on('data', (chunk) => {
-        videoBuffer.push(chunk);
-      });
-
-      videoStream.on('end', async () => {
-        try {
-          const finalVideoBuffer = Buffer.concat(videoBuffer);
-
-          const captionText = `
-╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
-│⿻ *Title:* ${firstVideo.title}
-│⿻ *Duration:* ${firstVideo.duration}
-│⿻ *Author:* ${firstVideo.author.name}
-│⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}  
-│⿻ *Upload Date:* ${formatUploadDate(firstVideo.uploadDate)}
-╰══•∞•═════════╯
-`;
-
-          await gss.sendMessage(m.chat, { document: finalVideoBuffer, mimetype: 'video/mp4', fileName: `${firstVideo.title}.mp4`, caption: captionText}, {quoted: m });
-          await doReact("✅");
-        } catch (err) {
-          console.error('Error sending video:', err);
-          m.reply('Error sending video.');
-          await doReact("❌");
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error during:', error);
-    m.reply('Unexpected error occurred.');
-    await doReact("❌");
-  }
-  break;
+    
 
 
-
-
-case 'yta':
+  case 'yta':
 case 'song':
 case 'ytmp3':
   try {
     if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+    if (isBanChat) return m.reply(mess.bangc);
     if (!text) {
-      m.reply('Enter YouTube Link or Search Query!');
+      m.reply('Masukan link video YouTube nya!');
       doReact("❌");
       return;
     }
@@ -2567,6 +2461,17 @@ case 'ytmp3':
 
     // Check if the input is a valid YouTube URL
     const isUrl = ytdl.validateURL(text);
+
+    const formatUploadDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    };
+
+    const formatDuration = (seconds) => {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
 
     if (isUrl) {
       // If it's a URL, directly use ytdl-core
@@ -2580,32 +2485,38 @@ case 'ytmp3':
       audioStream.on('end', async () => {
         try {
           const finalAudioBuffer = Buffer.concat(audioBuffer);
+          const videoInfo = await ytdl.getInfo(text);
 
-          const videoInfo = await yts({ videoId: ytdl.getURLVideoID(text) });
+          const title = videoInfo.videoDetails.title || 'N/A';
+          const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+          const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
+
           const thumbnailMessage = {
-  image: {
-    url: videoInfo.thumbnail,
-  },
-  caption: `
+            image: { url: videoInfo.videoDetails.thumbnails[0].url },
+            caption: `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Player* ✨
-│⿻ *Title:* ${videoInfo.title}
-│⿻ *Duration:* ${videoInfo.timestamp}
-│⿻ *Uploader:* ${videoInfo.author.name}
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
+│⿻ *Title:* ${title}
+│⿻ *Duration:* ${formattedDuration}
+│⿻ *Uploader:* ${videoInfo.videoDetails.author.name}
 │⿻ *Size:* ${formatBytes(finalAudioBuffer.length)}
-│⿻ *Upload Date:* ${formatUploadDate(videoInfo.uploadDate)}
+│⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
-`, 
-};
-
+            `
+          };
 
           await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
           await gss.sendMessage(m.chat, { audio: finalAudioBuffer, mimetype: 'audio/mpeg' }, { quoted: m });
+          await gss.sendMessage(m.chat, { 
+            document: finalAudioBuffer, 
+            mimetype: 'audio/mpeg', 
+            fileName: `${title}.mp3` 
+          }, { quoted: m });
           await doReact("✅");
         } catch (err) {
           console.error('Error sending audio:', err);
-          m.reply('Error sending audio.');
+          m.reply('Error saat mengirim audio.');
           await doReact("❌");
         }
       });
@@ -2615,7 +2526,7 @@ case 'ytmp3':
       const firstVideo = searchResult.videos[0];
 
       if (!firstVideo) {
-        m.reply('Audio not found.');
+        m.reply('Gak nemu audio nya.');
         await doReact("❌");
         return;
       }
@@ -2630,40 +2541,50 @@ case 'ytmp3':
       audioStream.on('end', async () => {
         try {
           const finalAudioBuffer = Buffer.concat(audioBuffer);
+          const videoInfo = await ytdl.getInfo(firstVideo.url);
+
+          const title = videoInfo.videoDetails.title || 'N/A';
+          const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+          const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
 
           const thumbnailMessage = {
-  image: {
-    url: firstVideo.thumbnail,
-  },
-  caption: `
+            image: { url: videoInfo.videoDetails.thumbnails[0].url },
+            caption: `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp3 Player* ✨
-│⿻ *Title:* ${firstVideo.title}
-│⿻ *Duration:* ${firstVideo.timestamp}
-│⿻ *Uploader:* ${firstVideo.author.name}
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
+│⿻ *Title:* ${title}
+│⿻ *Duration:* ${formattedDuration}
+│⿻ *Uploader:* ${videoInfo.videoDetails.author.name}
 │⿻ *Size:* ${formatBytes(finalAudioBuffer.length)}
-│⿻ *Upload Date:* ${formatUploadDate(firstVideo.uploadDate)}
+│⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
-`,
-};
+            `
+          };
+
           await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
           await gss.sendMessage(m.chat, { audio: finalAudioBuffer, mimetype: 'audio/mpeg' }, { quoted: m });
+          await gss.sendMessage(m.chat, { 
+            document: finalAudioBuffer, 
+            mimetype: 'audio/mpeg', 
+            fileName: `${title}.mp3` 
+          }, { quoted: m });
           await doReact("✅");
         } catch (err) {
           console.error('Error sending audio:', err);
-          m.reply('Error sending audio.');
+          m.reply('Error saat mengirim audio.');
           await doReact("❌");
         }
       });
     }
   } catch (error) {
     console.error('Error during:', error);
-    m.reply('Unexpected error occurred.');
+    m.reply('Ada yang error.');
     await doReact("❌");
   }
   break;
 
+    
 
 
 
@@ -2675,7 +2596,7 @@ case 'ytmp3doc':
     if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
     if (!text) {
-      m.reply('Enter YouTube Link or Search Query!');
+      m.reply('Masukan link video YouTube nya!');
       doReact("❌");
       return;
     }
@@ -2706,7 +2627,7 @@ case 'ytmp3doc':
   },
   caption: `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
+│⿻ *EKUSHI ☆*
 │  *Youtube Player* ✨
 │⿻ *Title:* ${videoInfo.title}
 │⿻ *Duration:* ${videoInfo.timestamp}
@@ -2723,7 +2644,7 @@ case 'ytmp3doc':
           await doReact("✅");
         } catch (err) {
           console.error('Error sending audio:', err);
-          m.reply('Error sending audio.');
+          m.reply('Error saat mengirim audio.');
           await doReact("❌");
         }
       });
@@ -2733,7 +2654,7 @@ case 'ytmp3doc':
       const firstVideo = searchResult.videos[0];
 
       if (!firstVideo) {
-        m.reply('Audio not found.');
+        m.reply('Gak nemu audio nya nih....');
         await doReact("❌");
         return;
       }
@@ -2755,7 +2676,7 @@ case 'ytmp3doc':
   },
   caption: `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
+│⿻ *EKUSHI ☆*
 │  *Youtube Mp3 Player* ✨
 │⿻ *Title:* ${firstVideo.title}
 │⿻ *Duration:* ${firstVideo.timestamp}
@@ -2770,14 +2691,14 @@ case 'ytmp3doc':
           await doReact("✅");
         } catch (err) {
           console.error('Error sending audio:', err);
-          m.reply('Error sending audio.');
+          m.reply('Error saat mengirim audio.');
           await doReact("❌");
         }
       });
     }
   } catch (error) {
     console.error('Error during:', error);
-    m.reply('Unexpected error occurred.');
+    m.reply('Ada yang error.');
     await doReact("❌");
   }
   break;
@@ -2785,11 +2706,11 @@ case 'ytmp3doc':
 
 
 
-case 'yts': case 'ytsearch': {
+case 'yts': case 'ytsearch': case 'play': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
-    return m.reply('Enter YouTube Video Link or Search Query!');
+    return m.reply('Masukan link video YouTube nya!');
   }
   await doReact("🕘");
 
@@ -2822,11 +2743,11 @@ case 'yts': case 'ytsearch': {
 
       optionIndex += 1;
     } else {
-      return m.reply('No search results found.');
+      return m.reply('Gak nemu apa apa coba cari pake judul lain.');
     }
   } catch (error) {
     console.error('Error during yts:', error);
-    return m.reply('Unexpected error occurred.');
+    return m.reply('Ada yang error.');
   }
   break;
 }
@@ -2842,17 +2763,17 @@ function formatUploadDate(uploadDate) {
 
 case '𝐩𝐥𝐚𝐲': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
-    return m.reply('Please specify the video you want to play. Use the format: play [unique-key]');
-    doReact("❌");
+    m.reply('Please specify the video you want to play. Use the format: play [unique-key]');
+    return doReact("❌");
   }
 
   const match = text.match(/(\d+)\.(\d+)/);
 
   if (!match) {
-    return m.reply('Invalid format. Please provide a valid unique key (e.g., 1.1)');
-    doReact("❌");
+    m.reply('Invalid format. Please provide a valid unique key (e.g., 1.1)');
+    return doReact("❌");
   }
 
   const optionIndex = parseInt(match[1]);
@@ -2867,16 +2788,23 @@ case '𝐩𝐥𝐚𝐲': {
       try {
         const videoInfo = await ytdl.getInfo(selectedUrl);
 
+        const formatDuration = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
+
         const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
-const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A'; 
-        // Construct caption with audio details
+        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+        const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
+
         const pollMessage = `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
 │⿻ *Title:* ${title}
 │⿻ *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
-│⿻ *Duration:* ${videoInfo.videoDetails.lengthSeconds}s
+│⿻ *Duration:* ${formattedDuration}
 │⿻ *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
 │⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
@@ -2888,11 +2816,11 @@ const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
           `.𝐀𝐮𝐝𝐢𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭 ${optionIndex}.${subOption}`,
           `.𝐕𝐢𝐝𝐞𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭 ${optionIndex}.${subOption}`
         ]);
-        await doReact("✅");
+        return doReact("✅");
       } catch (error) {
         console.error('Error during poll creation:', error);
-        return m.reply('Unexpected error occurred during poll creation.');
-        doReact("❌");
+        m.reply('Unexpected error occurred during poll creation.');
+        return doReact("❌");
       }
     } else {
       return m.reply('Invalid sub-option. Please choose a valid sub-option.');
@@ -2902,7 +2830,6 @@ const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
   }
   break;
 }
-
 
 async function streamToBuffer(stream) {
   const chunks = [];
@@ -2912,20 +2839,21 @@ async function streamToBuffer(stream) {
   return Buffer.concat(chunks);
 }
 
-
 case '𝐀𝐮𝐝𝐢𝐨': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
-    return m.reply('Please specify the unique key for audio playback. Use the format: audio [unique-key]');
-    doReact("❌");
+    m.reply('Please specify the unique key for audio playback. Use the format: audio [unique-key]');
+    return doReact("❌");
   }
+
+  m.reply(mess.wait);
 
   const match = text.match(/(\d+)\.(\d+)/);
 
   if (!match) {
-    return m.reply('Invalid format. Please provide a valid unique key (e.g., 1.1)');
-    doReact("❌");
+    m.reply('Invalid format. Please provide a valid unique key (e.g., 1.1)');
+    return doReact("❌");
   }
 
   const optionIndex = parseInt(match[1]);
@@ -2938,49 +2866,44 @@ case '𝐀𝐮𝐝𝐢𝐨': {
 
     if (selectedUrl) {
       try {
-        // Fetch video info for additional details
         const videoInfo = await ytdl.getInfo(selectedUrl);
 
-        // Get the video thumbnail
-        const thumbnailUrl = videoInfo.videoDetails.thumbnails[0].url;
+        const formatDuration = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
 
-const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
-const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A'; 
-        // Construct caption with audio details
+        const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
+        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+        const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
+
         const caption = `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
 │⿻ *Title:* ${title}
 │⿻ *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
-│⿻ *Duration:* ${videoInfo.videoDetails.lengthSeconds}s
+│⿻ *Duration:* ${formattedDuration}
 │⿻ *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
 │⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
 `;
 
-        // Fetch audio stream directly
         const audioStream = ytdl(selectedUrl, { quality: 'highestaudio', filter: 'audioonly' });
-
-        // Convert the stream to buffer for sending
         const audioBuffer = await streamToBuffer(audioStream);
 
-        // Send the thumbnail as an image along with audio info
         await gss.sendMessage(m.chat, {
-          image: {
-            url: thumbnailUrl,
-          },
+          image: { url: videoInfo.videoDetails.thumbnails[0].url },
           caption: caption,
-        }, {
-          quoted: m,
-        });
+        }, { quoted: m });
 
-        // Send the audio as a voice message
         await gss.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg' });
-        await doReact("✅");
+        return doReact("✅");
       } catch (error) {
         console.error('Error during audio playback:', error);
-        return m.reply('Unexpected error occurred during audio playback.');
+        m.reply('Unexpected error occurred during audio playback.');
+        return doReact("❌");
       }
     } else {
       return m.reply('Invalid sub-option. Please choose a valid sub-option.');
@@ -2990,15 +2913,15 @@ const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
   }
   break;
 }
-
-
 
 case '𝐀𝐮𝐝𝐢𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
     return m.reply('Please specify the unique key for audio playback. Use the format: audio [unique-key]');
   }
+
+  m.reply(mess.wait);
 
   const match = text.match(/(\d+)\.(\d+)/);
 
@@ -3016,53 +2939,49 @@ case '𝐀𝐮𝐝𝐢𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭': {
 
     if (selectedUrl) {
       try {
-        // Fetch video info for additional details
         const videoInfo = await ytdl.getInfo(selectedUrl);
 
-        // Get the video thumbnail
-        const thumbnailUrl = videoInfo.videoDetails.thumbnails[0].url;
+        const formatDuration = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
 
-const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
-const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A'; 
-        // Construct caption with audio details
+        const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
+        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+        const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
+
         const caption = `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
 │⿻ *Title:* ${title}
 │⿻ *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
-│⿻ *Duration:* ${videoInfo.videoDetails.lengthSeconds}s
+│⿻ *Duration:* ${formattedDuration}
 │⿻ *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
 │⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
 `;
 
-        // Fetch audio stream directly
         const audioStream = ytdl(selectedUrl, { quality: 'highestaudio', filter: 'audioonly' });
-
-        // Convert the stream to buffer for sending
         const audioBuffer = await streamToBuffer(audioStream);
 
-        // Send the thumbnail as an image along with audio info
         await gss.sendMessage(m.chat, {
-          image: {
-            url: thumbnailUrl,
-          },
+          image: { url: videoInfo.videoDetails.thumbnails[0].url },
           caption: caption,
-        }, {
-          quoted: m,
-        });
+        }, { quoted: m });
 
-        // Send the audio as a voice message
         await gss.sendMessage(m.chat, {
-  document: audioBuffer,
-  mimetype: 'audio/mpeg',
-  fileName: `${title}.mp3`,
-}, { quoted: m });
-await doReact("✅");
+          document: audioBuffer,
+          mimetype: 'audio/mpeg',
+          fileName: `${title}.mp3`,
+        }, { quoted: m });
+
+        return doReact("✅");
       } catch (error) {
         console.error('Error during audio playback:', error);
-        return m.reply('Unexpected error occurred during audio playback.');
+        m.reply('Unexpected error occurred during audio playback.');
+        return doReact("❌");
       }
     } else {
       return m.reply('Invalid sub-option. Please choose a valid sub-option.');
@@ -3072,8 +2991,6 @@ await doReact("✅");
   }
   break;
 }
-
-
 
 case '𝐕𝐢𝐝𝐞𝐨': {
   if (isBan) return m.reply(mess.banned);
@@ -3216,170 +3133,7 @@ const captionText = `
   break;
 }
 
-case 'play': {
-  if (isBan) return m.reply(mess.banned);
-  if (isBanChat) return m.reply(mess.bangc);
-  if (!text) return m.reply('Enter Search Query!');
 
-  try {
-    const searchResults = await yts(text);
-
-    if (!searchResults.videos || searchResults.videos.length === 0) {
-      return m.reply('No search results found.');
-    }
-
-    const resultsArray = searchResults.videos.slice(0, 5).map((result, index) => {
-      const { url, title, duration, views, author, timestamp } = result;
-      const uniqueKey = title.toLowerCase().replace(/\s/g, '_');
-      videoSearchResults.set(`${m.chat}_${index}`, { uniqueKey, url, title, duration, views, author, timestamp });
-      return { index, title, duration, views, author, timestamp };
-    });
-
-    currentPollIndex = 0;
-
-    const pollOptions = ['.𝗔𝗨𝗗𝗜𝗢', '.𝗔𝗨𝗗𝗜𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧', '.𝗩𝗜𝗗𝗘𝗢', '.𝗩𝗜𝗗𝗘𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧', '.𝗡𝗘𝗫𝗧'];
-
-    gss.sendPoll(
-      m.chat,
-      `Choose an option:\n\n"${resultsArray[currentPollIndex].title}":\nDuration: ${resultsArray[currentPollIndex].duration}\nViews: ${resultsArray[currentPollIndex].views}\nAuthor: ${resultsArray[currentPollIndex].author}\nUpload Date: ${resultsArray[currentPollIndex].timestamp}`,
-      pollOptions
-    );
-  } catch (error) {
-    console.error('Error during play:', error);
-    m.reply('Unexpected error occurred. please vote on next and try again');
-  }
-  break;
-}
-
-case '𝗔𝗨𝗗𝗜𝗢':
-case '𝗩𝗜𝗗𝗘𝗢':
-case '𝗔𝗨𝗗𝗜𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧':
-case '𝗩𝗜𝗗𝗘𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧':
-case '𝗡𝗘𝗫𝗧': {
-  if (isBan) return m.reply(mess.banned);
-  if (isBanChat) return m.reply(mess.bangc);
-  const pollOption = command.toLowerCase();
-
-  if (!videoSearchResults.has(`${m.chat}_${currentPollIndex}`)) {
-    return m.reply('No search results found.');
-  }
-
-  const currentResult = videoSearchResults.get(`${m.chat}_${currentPollIndex}`);
-
-  switch (pollOption) {
-    case '𝗔𝗨𝗗𝗜𝗢': {
-      try {
-        if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-
-        const audioStream = ytdl(currentResult.url, { quality: 'highestaudio', filter: 'audioonly' });
-        const audioBuffer = await new Promise((resolve, reject) => {
-          const chunks = [];
-          audioStream.on('data', (chunk) => chunks.push(chunk));
-          audioStream.on('end', () => resolve(Buffer.concat(chunks)));
-          audioStream.on('error', (error) => reject(error));
-        });
-
-        await gss.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mp4', fileName: `${currentResult.title}.mp3` }, { quoted: m });
-      } catch (error) {
-        console.error(`Error during audio download:`, error);
-        m.reply('Unexpected error occurred.please vote on next and try again');
-      }
-      break;
-    }
-
-    case '𝗔𝗨𝗗𝗜𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧': {
-      try {
-        if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-
-        const audioStream = ytdl(currentResult.url, { quality: 'highestaudio', filter: 'audioonly' });
-        const audioBuffer = await new Promise((resolve, reject) => {
-          const chunks = [];
-          audioStream.on('data', (chunk) => chunks.push(chunk));
-          audioStream.on('end', () => resolve(Buffer.concat(chunks)));
-          audioStream.on('error', (error) => reject(error));
-        });
-
-        await gss.sendMessage(m.chat, { document: audioBuffer, mimetype: 'audio/mp3', fileName: `${currentResult.title}.mp3` }, { quoted: m });
-      } catch (error) {
-        console.error(`Error during audio download:`, error);
-        m.reply('Unexpected error occurred.please vote on next and try again');
-      }
-      break;
-    }
-
-    case '𝗩𝗜𝗗𝗘𝗢': {
-      try {
-        if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-
-        const videoStream = ytdl(currentResult.url, { quality: 'highest', filter: 'audioandvideo' });
-        const videoBuffer = await new Promise((resolve, reject) => {
-          const chunks = [];
-          videoStream.on('data', (chunk) => chunks.push(chunk));
-          videoStream.on('end', () => resolve(Buffer.concat(chunks)));
-          videoStream.on('error', (error) => reject(error));
-        });
-
-        await gss.sendMessage(m.chat, { video: videoBuffer, mimetype: 'video/mp4', caption: `Downloading video: ${currentResult.title}` }, { quoted: m });
-      } catch (error) {
-        console.error(`Error during video download:`, error);
-        m.reply('Unexpected error occurred.please vote on next and try again');
-      }
-      break;
-    }
-
-    case '𝗩𝗜𝗗𝗘𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧': {
-      try {
-        if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-
-        const videoStream = ytdl(currentResult.url, { quality: 'highest', filter: 'audioandvideo' });
-        const videoBuffer = await new Promise((resolve, reject) => {
-          const chunks = [];
-          videoStream.on('data', (chunk) => chunks.push(chunk));
-          videoStream.on('end', () => resolve(Buffer.concat(chunks)));
-          videoStream.on('error', (error) => reject(error));
-        });
-
-        await gss.sendMessage(m.chat, { document: videoBuffer, mimetype: 'video/mp4', fileName: `${currentResult.title}.mp4`, caption: `Downloading video: ${currentResult.title}` }, { quoted: m });
-      } catch (error) {
-        console.error(`Error during video download:`, error);
-        m.reply('Unexpected error occurred.please vote on next and try again');
-      }
-      break;
-    }
-
-    case '𝗡𝗘𝗫𝗧': {
-      if (isBan) return m.reply(mess.banned);
-      if (isBanChat) return m.reply(mess.bangc);
-
-      currentPollIndex++;
-      if (videoSearchResults.has(`${m.chat}_${currentPollIndex}`)) {
-        const nextResult = videoSearchResults.get(`${m.chat}_${currentPollIndex}`);
-
-        const pollOptions = ['.𝗔𝗨𝗗𝗜𝗢', '.𝗔𝗨𝗗𝗜𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧', '.𝗩𝗜𝗗𝗘𝗢', '.𝗩𝗜𝗗𝗘𝗢𝗗𝗢𝗖𝗨𝗠𝗘𝗡𝗧', '.𝗡𝗘𝗫𝗧'];
-
-        await gss.sendPoll(
-          m.chat,
-          `Choose an option:\n\n"${nextResult.title}":\nDuration: ${nextResult.duration}\nViews: ${nextResult.views}\nAuthor: ${nextResult.author}\nUpload Date: ${nextResult.timestamp}`,
-          pollOptions
-        );
-      } else {
-        m.reply('No more search results available.');
-      }
-
-      break;
-    }
-
-    default:
-      m.reply('Invalid option.');
-      break;
-  }
-
-  break;
-}
 
 
 
@@ -3393,94 +3147,145 @@ case '𝗡𝗘𝗫𝗧': {
 
 
 
-async function instaDownload(url) {
-    try {
-        const apiUrl = `https://instagramdownloader.apinepdev.workers.dev/?url=${encodeURIComponent(url)}`;
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-            const errorMessage = await response.text();
-            throw new Error(`API Error (${response.status}): ${errorMessage}`);
-        }
-
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        console.error(`Error with API: ${error.message}`);
-        throw error;
-    }
-}
-
-async function downloadInstagramMedia(url) {
-    try {
-        const result = await instaDownload(url);
-
-        console.log('API Response:', result);
-
-        if (result.status && result.data && result.data.length > 0) {
-            const mediaType = result.data[0].type;
-            const mediaUrl = result.data[0].url;
-
-            if (mediaType && mediaUrl) {
-                return { type: mediaType, url: mediaUrl };
-            } else {
-                throw new Error('Media type or URL not found in API response');
-            }
-        } else {
-            throw new Error('Invalid or unexpected API response');
-        }
-    } catch (error) {
-        console.error('Error downloading Instagram media:', error.message);
-        throw error;
-    }
-}
-
-
-async function downloadAndSendMedia(m, text, isDocument) {
-    const url = text;
-
-    if (!url) {
-        return m.reply(`Where is the link?\n\nExample: ${prefix + command} https://www.instagram.com/p/CK0tLXyAzEI`);
-    }
-
-    m.reply(mess.wait);
-
-    try {
-        const media = await downloadInstagramMedia(url);
-
-        const response = await fetch(media.url);
-        const bufferArray = await response.arrayBuffer();
-        const fileBuffer = Buffer.from(bufferArray);
-
-        const fileName = `instagram_media.${media.type === 'image' ? 'jpg' : 'mp4'}`;
-
-        
-        if (isDocument) {
-            await gss.sendMessage(m.chat, { document: fileBuffer, mimetype: `video/mp4`, fileName, caption: 'Downloaded by gss botwa' }, { quoted: m });
-        } else {
-            if (media.type === 'image') {
-                await gss.sendMessage(m.chat, { image: fileBuffer, mimetype: 'image/jpeg', fileName, caption: 'Downloaded by gss botwa' }, { quoted: m });
-            } else if (media.type === 'video') {
-                await gss.sendMessage(m.chat, { video: fileBuffer, mimetype: 'video/mp4', fileName, caption: 'Downloaded by gss botwa' }, { quoted: m });
-            } else {
-                throw new Error('Unsupported media type');
-            }
-        }
-    } catch (error) {
-        console.error('Error while processing Instagram media:', error);
-        return m.reply(`An error occurred: ${error.message}`);
-    }
-}
-
-
-case 'igdl':
-case 'insta':
-case 'ig':
-case 'instagram':
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    await downloadAndSendMedia(m, text, false);
-    break;
+            async function instaDownload(url) {
+              try {
+                  const apiUrl = `https://api.agatz.xyz/api/instagram?url=${encodeURIComponent(url)}`;
+                  const response = await fetch(apiUrl);
+          
+                  if (!response.ok) {
+                      const errorMessage = await response.text();
+                      throw new Error(`API Error (${response.status}): ${errorMessage}`);
+                  }
+          
+                  const result = await response.json();
+                  return result;
+              } catch (error) {
+                  console.error(`Error with API: ${error.message}`);
+                  throw error;
+              }
+          }
+          
+          async function downloadInstagramMedia(url) {
+              try {
+                  const result = await instaDownload(url);
+          
+                  console.log('API Response:', result);
+          
+                  if (result.status === 200 && result.data && result.data.length > 0) {
+                      const mediaUrls = result.data;
+                      console.log('Media URLs:', mediaUrls);
+          
+                      const mediaItems = [];
+                      for (const media of mediaUrls) {
+                          const mediaUrl = media.link;
+                          const mediaResponse = await fetch(mediaUrl);
+                          if (!mediaResponse.ok) {
+                              throw new Error('Error fetching media content for type inspection');
+                          }
+                          const contentType = mediaResponse.headers.get('content-type');
+                          console.log('Content Type:', contentType);
+          
+                          const mediaType = contentType.includes('video') ? 'video' : 'image';
+                          mediaItems.push({ type: mediaType, url: mediaUrl });
+                      }
+          
+                      return mediaItems;
+                  } else {
+                      throw new Error('Invalid or unexpected API response');
+                  }
+              } catch (error) {
+                  console.error('Error downloading Instagram media:', error.message);
+                  throw error;
+              }
+          }
+          
+          async function downloadAndSendMedia(m, text, isDocument) {
+              const url = text;
+          
+              if (!url) {
+                  return m.reply(`Link nya manah?\n\nContoh: ${prefix + command} https://www.instagram.com/p/CK0tLXyAzEI`);
+              }
+          
+              m.reply(mess.wait);
+          
+              try {
+                  const mediaItems = await downloadInstagramMedia(url);
+                  const imageItems = mediaItems.filter(media => media.type === 'image');
+                  const videoItems = mediaItems.filter(media => media.type === 'video');
+          
+                  if (imageItems.length > 0) {
+                      if (imageItems.length === 1) {
+                          const imageUrl = imageItems[0].url;
+                          const response = await fetch(imageUrl);
+                          const bufferArray = await response.arrayBuffer();
+                          const fileBuffer = Buffer.from(bufferArray);
+                          await gss.sendMessage(m.chat, { image: fileBuffer, mimetype: 'image/jpeg', caption: '' }, { quoted: m });
+                      } else {
+                          const createImage = async (url) => {
+                              const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+                              return imageMessage;
+                          }
+          
+                          const cards = [];
+                          for (const imageUrl of imageItems) {
+                              const imageMessage = await createImage(imageUrl.url);
+                              cards.push({
+                                  header: { hasMediaAttachment: true, imageMessage },
+                                  nativeFlowMessage: {}
+                              });
+                          }
+          
+                          const { message, key } = generateWAMessageFromContent(m.chat, {
+                              interactiveMessage: {
+                                  body: { text: `𝐒𝐞𝐥𝐞𝐬𝐚𝐢 𝐧𝐢𝐡.....` },
+                                  footer: { text: "Instagram Download EKUSHI ☆" },
+                                  carouselMessage: { cards }
+                              }
+                          }, { quoted: m });
+          
+                          await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+                      }
+                  }
+          
+                  if (videoItems.length > 0) {
+                      for (const media of videoItems) {
+                          const response = await fetch(media.url);
+                          if (!response.ok) {
+                              throw new Error('Error fetching media content');
+                          }
+                          const bufferArray = await response.arrayBuffer();
+                          const fileBuffer = Buffer.from(bufferArray);
+          
+                          const fileName = `instagram_media.mp4`;
+                          const mimeType = 'video/mp4';
+          
+                          console.log('Sending media with MIME type:', mimeType);
+          
+                          if (isDocument) {
+                              await gss.sendMessage(m.chat, { document: fileBuffer, mimetype: mimeType, fileName }, { quoted: m });
+                          } else {
+                              await gss.sendMessage(m.chat, { video: fileBuffer, mimetype: mimeType, fileName, caption: 'Instagram Download EKUSHI ☆' }, { quoted: m });
+                          }
+                      }
+                  }
+              } catch (error) {
+                  console.error('Error while processing Instagram media:', error);
+                  return m.reply(`An error occurred: ${error.message}`);
+              }
+          }
+          
+          // Example command handling
+          case 'igdl':
+          case 'insta':
+          case 'ig':
+          case 'instagram':
+              if (isBan) return m.reply(mess.banned);
+              if (isBanChat) return m.reply(mess.bangc);
+              await downloadAndSendMedia(m, text, false);
+              break;
+          
+          
+          
 
 
 case 'toanime':
@@ -3505,7 +3310,7 @@ case 'toanime':
 
       // Generate anime version using Lolhuman API or Caliph API as a fallback
       try {
-        const anime = `https://api.lolhuman.xyz/api/imagetoanime?apikey=GataDios&img=${image}`;
+        const anime = `https://api.lolhuman.xyz/api/imagetoanime?apikey=GataDiosV2&img=${image}`;
         await gss.sendMedia(m.chat, anime, 'error.jpg', null, m);
       } catch (i) {
         // If Lolhuman API fails, try Caliph API as a fallback
@@ -3536,7 +3341,7 @@ case 'kiss': case 'bite': case 'yeet': case 'bully': case 'bonk':
 case 'wink': case 'poke': case 'nom': case 'slap': case 'smile': 
 case 'wave': case 'awoo': case 'blush': case 'smug': case 'glomp': 
 case 'happy': case 'dance': case 'cringe': case 'cuddle': case 'highfive': 
-case 'shinobu': case 'handhold': {
+case 'handhold': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
 axios.get(`https://api.waifu.pics/sfw/${isCommand}`)
@@ -3545,95 +3350,6 @@ gss.sendImageAsSticker(m.chat, data.url, m, { packname: global.packname, author:
 })
 }
 break
-
-
-
-case 'true':
-case 'truecaller':
-  try {
-    if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!text) {
-      // Reply when no phone number is provided
-    return  m.reply ('Please provide a phone number.');
-      break;
-    }
-
-    const installationId = 'a1i05--log7Ae-hk9y85780NEfKnif3z77XFt4zZn7Bi10zGXS0qVduxj7CRHxQw';
-    const apiUrl = `https://sid-bhai.vercel.app/api/truecaller?phone=${encodeURIComponent(text)}&id=${installationId}`;
-
-    let response = await axios.get(apiUrl);
-    console.log(response);
-    let json = response.data;
-
-    const { name, alternateName, addresses, email, countryDetails } = json;
-
-    let info = `╭––『 *Phone Detail* 』\n`;
-    info += `┆ ⚝ *Name:* ${name}\n`;
-
-    if (addresses && addresses.length > 0) {
-      info += `┆ ⚝ *Address:* ${addresses[0].city}, ${addresses[0].countryCode}\n`;
-      info += `┆ ⚝ *Time Zone:* ${addresses[0].timeZone}\n`;
-      info += `┆ ⚝ *Pin Code* ${addresses[0].zipCode}\n`;
-      info += `┆ ⚝ *Street* ${addresses[0].street}\n`;
-    }
-
-    info += `┆ ⚝ *Email:* ${email}\n`;
-    info += `╰–––––––––––––––༓\n`;
-
-    if (countryDetails) {
-      info += `╭––『 *countryDetails* 』\n`;
-      info += `┆ ⚝ *Name:* ${countryDetails.name}\n`;
-      info += `┆ ⚝ *Native:* ${countryDetails.native}\n`;
-      info += `┆ ⚝ *Phone Code:* +${countryDetails.phone[0]}\n`;
-      info += `┆ ⚝ *Continent:* ${countryDetails.continent}\n`;
-      info += `┆ ⚝ *Capital:* ${countryDetails.capital}\n`;
-      info += `┆ ⚝ *Currency:* ${countryDetails.currency.join(', ')}\n`;
-      info += `┆ ⚝ *Languages:* ${countryDetails.languages.join(', ')}\n`;
-      info += `┆ ⚝ *Flag:* ${countryDetails.flag}\n`;
-      info += `╰–––––––––––––––༓`;
-    }
-
-    await gss.sendMessage(m.chat, {
-      text: info,
-    }, {
-      quoted: m,
-    });
-
-  } catch (error) {
-    console.error(error);
-  }
-  break;
-
-
-case "xnxxdl": {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-	if (!text) return m.reply(`Enter Url`)
-        if (!text.includes('xnxx.com')) return m.reply(`Enter an xnxx link`)
-        const fg = require('api-dylux')
-            let xn = await fg.xnxxdl(text)
-gss.sendMessage(m.chat, { caption: `  *XNXX DL*
-        
-✍ *Title:* ${xn.title}
-⌛ *Duration:* ${xn.duration}
-📽 *Visual Quality:* ${xn.quality}`, video: {url: xn.url_dl} }, { quoted: m })
-}
-break
-
-
-case 'xnxxsearch': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-	if (!text) return m.reply(`Enter Query`)
-	const fg = require('api-dylux')
-	let res = await fg.xnxxSearch(text)
-            let ff = res.result.map((v, i) => `${i + 1}┃ *Title* : ${v.title}\n*Link:* ${v.link}\n`).join('\n') 
-              if (res.status) m.reply(ff)
-              }
-              break
-              
-
 
 case 'qc':
   if (isBan) return m.reply(mess.banned);
@@ -3914,20 +3630,18 @@ case 'surah': case 'quran':
     // Translate tafsir from Bahasa Indonesia to English
     let translatedTafsirEnglish = '';
     try {
-        translatedTafsirEnglish = await translate(json.data.tafsir.id, { to: 'en' });
+        translatedTafsirEnglish = await translate(json.data.tafsir.id, { to: 'id' });
     } catch (error) {
-        console.error('Error translating to English:', error);
+        console.error('Error translating to Indonesia:', error);
         translatedTafsirEnglish = 'Translation not available';
     }
 
     let quranSurah = `
-    🕌 *Quran: The Holy Book*\n
+    🕌 *Quran*\n
     📜 *Surah ${json.data.number}: ${json.data.asma.ar.long} (${json.data.asma.en.long})*\n
-    Type: ${json.data.type.en}\n
-    Number of verses: ${json.data.ayahCount}\n
-    🔮 *Explanation (Urdu):*\n
+    🔮 *Bacaan (Urdu):*\n
     ${translatedTafsirUrdu}\n
-    🔮 *Explanation (English):*\n
+    🔮 *Artinya (Indonesia):*\n
     ${translatedTafsirEnglish}`;
 
     m.reply(quranSurah);
@@ -3944,19 +3658,19 @@ case 'mediafire': {
         if (isBanChat) return m.reply(mess.bangc);
     // Check if the command has rguments
     if (args.length === 0) {
-        return m.reply(`Where is the link? \n\nExample: ${prefix + command} https://www.mediafire.com/file/96mscj81p92na3r/images+(35).jpeg/file`);
+        return m.reply(`Link nya manah? \n\nContoh: ${prefix + command} https://www.mediafire.com/file/96mscj81p92na3r/images+(35).jpeg/file`);
     }
 
     // Check if the argument is a valid MediaFire link
     if (!isUrl(args[0]) && !args[0].includes('mediafire.com')) {
-        return m.reply(`The link you provided is invalid`);
+        return m.reply(`Link yang kamu kasih salah/rusak`);
     }
 
     // Import the mediafireDl function from the mediafire.js file
     const { mediafireDl } = require('./lib/mediafire.js');
 
     // Reply with a "Please wait..." message
-    await m.reply(`Please wait...`);
+    await m.reply(mess.wait);
 
     try {
         // Call the mediafireDl function to get details about the file
@@ -3964,7 +3678,7 @@ case 'mediafire': {
 
         // Check if the file size is too big
         if (fileInfo[0].size.split('MB')[0] >= 100) {
-            return m.reply('Oops, the file is too big...');
+            return m.reply('Walah, file nya terlalu gede maximum nya cuman 100MB');
         }
 
         // Send the file to the user with a caption
@@ -3976,7 +3690,7 @@ case 'mediafire': {
                 },
                 fileName: fileInfo[0].nama,
                 mimetype: fileInfo[0].mime,
-                caption: `Downloaded by gss botwa: ${fileInfo[0].nama}`,  // Add your desired caption
+                caption: `Downloaded by EKUSHI ☆: ${fileInfo[0].nama}`,  // Add your desired caption
             },
             { quoted: m }
         );
@@ -3989,34 +3703,6 @@ case 'mediafire': {
     break;
 }
 
-
-   
-
-case 'buypremium':
-            case 'premiumuser': {
-              if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-                let teks = `Hi ${pushname}👋\n Want to Buy Premium? Just chat with the owner😉`
-                await gss.sendMessage(m.chat, {
-                    text: teks,
-                    contextInfo: {
-                        externalAdReply: {
-                            showAdAttribution: false,
-                            title: 'BUY PREMIUM',
-                            body: `15k / MONTH`,
-                            thumbnailUrl: 'https://telegra.ph/file/0955010ca2f8bf045fb0a.jpg',
-                            sourceUrl: global.link,
-                            mediaType: 1,
-                            renderLargerThumbnail: false
-                        }
-                    }
-                }, {
-                    quoted: m
-                })
-            }
-            break
-            
-            
 
 
 case 'invite': case 'add': {
@@ -4041,19 +3727,18 @@ case 'fb': case 'fbdl': case 'facebook': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
     if (!args[0]) {
-        throw ` Please send the link of a Facebook video\n\nEXAMPLE :\n *${prefix + command}* https://fb.watch/7B5KBCgdO3`;
+        throw `Mana link nya?\n\nContoh:\n *${prefix + command}* https://fb.watch/7B5KBCgdO3`;
     }
 
     const urlRegex = /^(?:https?:\/\/)?(?:www\.)?(?:facebook\.com|fb\.watch)\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
     if (!urlRegex.test(args[0])) {
-        throw '⚠️ PLEASE GIVE A VALID URL.';
+        throw '⚠️ PLEASE KASIH LINK YANG BENER.';
     }
-     await m.reply(`Please wait...`);
+     await m.reply(mess.wait);
     try {
         const result = await fg.fbdl(args[0]);
         const tex = `
-  *Video Details* 
-📽️ *Title*: ${result.title}
+*Title*: ${result.title}
 `;
 
 
@@ -4084,31 +3769,6 @@ case 'fb': case 'fbdl': case 'facebook': {
     break;
 }
   
-case 'instastalk': case 'igs': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-if (!args[0]) return m.reply(`Enter Instagram Username\n\nExample: ${prefix + command} world_reacode_egg`)
-
-const igs = require('api-dylux')
-await m.reply(`Please wait...`);
-    try {
-    let res = await igs.igStalk(args[0])
-    let te = `
-┌──「 *Information* 
-▢ *🔖Name:* ${res.name} 
-▢ *🔖Username:* ${res.username}
-▢ *👥Follower:* ${res.followersH}
-▢ *🫂Following:* ${res.followingH}
-▢ *📌Bio:* ${res.description}
-▢ *🏝️Posts:* ${res.postsH}
-▢ *🔗 Link* : https://instagram.com/${res.username.replace(/^@/, '')}
-└────────────`
-     await gss.sendMessage(m.chat, {image: { url: res.profilePic }, caption: te }, {quoted: m})
-      } catch {
-        m.reply(`Make sure the username comes from *Instagram*`)
-      }
-}
-break;
 
  case 'autobio':
                 if (isBan) return m.reply(mess.banned);
@@ -4127,8 +3787,9 @@ break;
  case 'gitclone':
    if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-  if (!args[0]) return m.reply(`Where is the link?\nExample :\n${prefix}${command} https://github.com/sid238/Gss_Botwa`)
-  if (!isUrl(args[0]) && !args[0].includes('github.com')) return m.reply(`Link invalid!!`)
+        m.reply(mess.wait);
+  if (!args[0]) return m.reply(`Link nya manah?\nContoh :\n${prefix}${command} https://github.com/ExyXyz/ExyGantenk`)
+  if (!isUrl(args[0]) && !args[0].includes('github.com')) return m.reply(`Link nya salah!!`)
   let regex1 = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i
   let [, user, repo] = args[0].match(regex1) || []
   repo = repo.replace(/.git$/, '')
@@ -4143,7 +3804,7 @@ break;
 case 'google': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-  if (!text) throw `Example : ${prefix + command} fatih arridho`;
+  if (!text) throw `Example : ${prefix + command} exy ganteng`;
   let google = require('google-it');
   google({ 'query': text }).then(res => {
     let teks = `Google Search From : ${text}\n\n`;
@@ -4156,47 +3817,6 @@ case 'google': {
   });
 }
 break;
-
-
-
-
-case 'img': case 'gimage':
-    if (!text && !(m.quoted && m.quoted.text)) {
-      throw `Please provide some text , Example usage ${prefix + commands} gssbotwa`;
-    }
-    if (!text && m.quoted && m.quoted.text) {
-      text = m.quoted.text;
-    }
-
-    const match = text.match(/(\d+)/);
-    const numberOfImages = match ? parseInt(match[1]) : 1;
-
-    try {
-      m.reply('*Please wait*');
-
-      const images = [];
-
-      for (let i = 0; i < numberOfImages; i++) {
-        const endpoint = `https://api.guruapi.tech/api/googleimage?text=${encodeURIComponent(text)}`;
-        const response = await fetch(endpoint);
-
-        if (response.ok) {
-          const imageBuffer = await response.buffer();
-          images.push(imageBuffer);
-        } else {
-          throw '*Image generation failed*';
-        }
-      }
-
-      for (let i = 0; i < images.length; i++) {
-        await gss.sendMedia(m.chat, images[i], `image_${i + 1}.png`, null, m);
-      }
-    } catch {
-      throw '*Oops! Something went wrong while generating images. Please try again later.*';
-    }
-    break;
-
-
 
 
 case 'shorturl': case 'tiny': case 'tinyurl': {
@@ -4222,48 +3842,78 @@ case 'sticker': case 's': case 'stickergif': case 'sgif': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (/image/.test(mime)) {
-    m.reply(mess.wait);
     let media = await gss.downloadMediaMessage(qmsg);
     let encmedia = await gss.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author });
     await fs.unlinkSync(encmedia);
   } else if (/video/.test(mime)) {
-    m.reply(mess.wait);
-    if (qmsg.seconds > 11) return m.reply('Maximum duration is 10 seconds!');
+    if (qmsg.seconds > 11) return m.reply('Durasi maksimum nya 10 detik');
     let media = await gss.downloadMediaMessage(qmsg);
     let encmedia = await gss.sendVideoAsSticker(m.chat, media, m, { packname: global.packname, author: global.author });
     await fs.unlinkSync(encmedia);
   } else {
-    m.reply(`Send/reply with an image/video/gif with caption ${prefix + command}\nVideo/Gif duration 1-9 seconds`);
+    m.reply(`Kirim gambar/video atau reply gambar/video pake ${prefix + command}\nVideo/Gif durasi nya 1-9 detik`);
   }
 }
 break;
 
-case 'pinterest': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  m.reply(mess.wait);
-  let { pinterest } = require('./lib/scraper');
-  anu = await pinterest(text);
-  result = anu[Math.floor(Math.random() * anu.length)];
-  gss.sendMessage(m.chat, { image: { url: result }, caption: '⭔ Media Url : ' + result }, { quoted: m });
+
+
+case 'pinterest':
+  case 'pin': {
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    
+    let textParts = text.split('#');
+    let query = textParts[0].trim();
+    let limit = textParts[1] ? parseInt(textParts[1].trim()) : 1;
+
+    m.reply(mess.wait);
+    let { pinterest } = require('./lib/scraper');
+    let results = await pinterest(query);
+
+    if (!results || results.length === 0) {
+      throw new Error('No results found for the query');
+    }
+
+    // Limit the number of results to the specified limit
+    results = results.slice(0, limit);
+
+    if (results.length === 1) {
+      // Single image case
+      let result = results[0];
+      await gss.sendMessage(m.chat, { image: { url: result }, caption: '⭔ Media Url : ' + result }, { quoted: m });
+    } else {
+      // Multiple images case, send as carousel
+      const cards = [];
+      for (const result of results) {
+        const { imageMessage } = await generateWAMessageContent({ image: { url: result }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+        cards.push({
+          header: { hasMediaAttachment: true, imageMessage },
+          nativeFlowMessage: {}
+        });
+      }
+
+      const { message, key } = generateWAMessageFromContent(m.chat, {
+        interactiveMessage: {
+          body: { text: `𝐒𝐞𝐥𝐞𝐬𝐚𝐢 𝐧𝐢𝐡.....` },
+          footer: { text: "Pinterest EKUSHI ☆" },
+          carouselMessage: { cards }
+        }
+      }, { quoted: m });
+
+      await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+    }
+
+    await doReact("✅");
+  } catch (error) {
+    console.error('Error during:', error);
+    m.reply(`Ada yang error: ${error.message}`);
+    await doReact("❌");
+  }
 }
 break;
 
-
-case 'wallpaper': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  if (!text) throw 'Enter Query Title';
-  let { wallpaper } = require('./lib/scraper');
-  anu = await wallpaper(text);
-  result = anu[Math.floor(Math.random() * anu.length)];
-  let Message = {
-    image: { url: result.image[0] },
-    caption: `⭔ Title : ${result.title}\n⭔ Category : ${result.type}\n⭔ Detail : ${result.source}\n⭔ Media Url : ${result.image[2] || result.image[1] || result.image[0]}`,
-  };
-  gss.sendMessage(m.chat, Message, { quoted: m });
-}
-break;
 
 
 
@@ -4372,6 +4022,8 @@ case 'wikimedia': {
   gss.sendMessage(m.chat, Message, { quoted: m });
 }
 break;
+
+
 
         case 'ringtone': {
 if (isBan) throw mess.banned;
@@ -4493,26 +4145,6 @@ break;
             }
             break
 
-case 'ping': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-  await doReact("🕘");
-  const startTime = new Date();
-  const pingMsg = await gss.sendMessage(m.chat, { text: '*cheking...*' });
-
- await gss.relayMessage(m.chat, {
-      protocolMessage: {
-        key: pingMsg.key,
-        type: 14,
-        editedMessage: {
-          conversation: `*Pong:* ${new Date() - startTime} ms`
-        }
-      }
-    }, {});
-     await doReact("📍");
-  } 
-break;
-
             
             case 'owner': case 'creator': {
              
@@ -4520,6 +4152,10 @@ break;
             }
             break
 
+
+
+
+            
             
 case 'getbio':  
   if (isBan) return m.reply(mess.banned);
@@ -4543,7 +4179,7 @@ case 'getbio':
   }
   break; // Don't forget to add the 'break' statement at the end
   
-case 'system': case 'info': case 'ram': case 'usage':
+case 'system': case 'info': case 'ram': case 'usage': case 'ping':
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
 mainSys();
@@ -4596,32 +4232,107 @@ case 'tt':
 case 'tiktoknowm':
   try {
     if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!text) m.reply ('Enter Query Link!');
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) return m.reply('Enter Query Link!');
 
     m.reply(mess.wait);
 
-    let anu = await fetchJson(`https://api.lolhuman.xyz/api/tiktok2?apikey=GataDios&url=${encodeURIComponent(text)}`);
+    let anu = await fetchJson(`https://api.agatz.xyz/api/tiktok?url=${encodeURIComponent(text)}`);
 
     console.log('TikTok API Response:', anu);
 
-    if (anu.status === 200 && anu.message === 'success' && anu.result) {
-      const videoUrl = anu.result;
+    if (anu.status === 200 && anu.data) {
+      const result = anu.data;
 
-      const response = await axios.get(videoUrl, { responseType: 'arraybuffer' });
-      const videoBuffer = Buffer.from(response.data);
+      // Remove hashtags from the title
+      const title = result.title.split(' ').filter(word => !word.startsWith('#')).join(' ');
+      const nickname = result.author.nickname;
+      const caption = `*${nickname}*\n\n${title}`;
 
-      // Save the video to a temporary file
-      const randomName = `temp_${Math.floor(Math.random() * 10000)}.mp4`;
-      fs.writeFileSync(`./${randomName}`, videoBuffer);
+      const videoData = result.data.find(item => item.type === 'nowatermark');
+      const photos = result.data.filter(item => item.type === 'photo');
 
-      // Send the video using gss.sendMessage with the saved video
-      await gss.sendMessage(m.chat, { video: fs.readFileSync(`./${randomName}`), mimetype: 'video/mp4', caption: 'Downloaded by gss botwa' }, { quoted: m });
+      if (videoData && videoData.url) {
+        const response = await axios.get(videoData.url, { responseType: 'arraybuffer' });
+        const videoBuffer = Buffer.from(response.data);
 
-      // Delete the temporary file
-      fs.unlinkSync(`./${randomName}`);
+        const randomName = `temp_${Math.floor(Math.random() * 10000)}.mp4`;
+        fs.writeFileSync(`./${randomName}`, videoBuffer);
+
+        const thumbnailPath = './tutu.png';
+        const jpegThumbnail = fs.readFileSync(thumbnailPath);
+
+        await gss.sendMessage(m.chat, {
+          video: fs.readFileSync(`./${randomName}`),
+          mimetype: 'video/mp4',
+          caption: caption,
+          jpegThumbnail: jpegThumbnail
+        }, { quoted: m });
+
+        fs.unlinkSync(`./${randomName}`);
+      } else if (photos.length > 0) {
+        if (photos.length === 1) {
+          // Send a normal image message if there's only one image
+          await gss.sendMessage(m.chat, {
+            image: { url: photos[0].url },
+            caption: caption
+          }, { quoted: m });
+        } else {
+          // Send a carousel if there are multiple images
+          const createImage = async (url) => {
+            const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+            return imageMessage;
+          }
+
+          const cards = [];
+          for (const photo of photos) {
+            const imageMessage = await createImage(photo.url);
+            cards.push({
+              header: { hasMediaAttachment: true, imageMessage },
+              nativeFlowMessage: {}
+            });
+          }
+
+          const { message, key } = generateWAMessageFromContent(m.chat, {
+            interactiveMessage: {
+              body: { text: `𝐒𝐞𝐥𝐞𝐬𝐚𝐢 𝐧𝐢𝐡.....` },
+              footer: { text: "Tiktok Slide EKUSHI ☆" },
+              carouselMessage: { cards }
+            }
+          }, { quoted: m });
+
+          await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+        }
+      } else {
+        console.log('Error: No video or photos found in TikTok media.');
+        m.reply('Error: No video or photos found in TikTok media.');
+      }
+
+      // Fetch and send the TikTok audio
+      if (result.music_info && result.music_info.url) {
+        const audioUrl = result.music_info.url;
+
+        const audioRes = await axios.get(audioUrl, { responseType: 'arraybuffer' });
+        const audioBuffer = Buffer.from(audioRes.data);
+
+        const randomAudioName = `temp_${Math.floor(Math.random() * 10000)}.mp3`;
+        fs.writeFileSync(`./${randomAudioName}`, audioBuffer);
+
+        await gss.sendMessage(m.chat, {
+          audio: fs.readFileSync(`./${randomAudioName}`),
+          mimetype: 'audio/mp4',
+          ptt: false
+        }, { quoted: m });
+
+        fs.unlinkSync(`./${randomAudioName}`);
+      } else {
+        console.log('Error: Unable to fetch TikTok audio.');
+        m.reply('Error: Unable to fetch TikTok audio.');
+      }
+
     } else {
-      console.log ('Error: Unable to fetch TikTok video. Check the console logs for more details.');
+      console.log('Error: Unable to fetch TikTok media. Check the console logs for more details.');
+      m.reply('Error: Unable to fetch TikTok media. Check the console logs for more details.');
     }
   } catch (error) {
     console.error(error);
@@ -4630,64 +4341,339 @@ case 'tiktoknowm':
   break;
 
 
- case 'ttp':
-   case 'ttp3': 
-     case 'ttp4':
-       case 'ttp5':
-case 'attp':
-case 'ttp2':
-case 'attp2':
-case 'attp3':
-  if (isBan) return m.reply(mess.banned);
+
+
+
+
+
+
+
+  case 'tiktokhd':
+    case 'tthd':
+    case 'tiktoknowmhd':
+      try {
+        if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-  if (!q) return m.reply('Give me text');
-  m.reply(mess.wait);
+        if (!text) return m.reply('Enter Query Link!');
+    
+        m.reply(mess.wait);
+    
+        let anu = await fetchJson(`https://api.agatz.xyz/api/tiktok?url=${encodeURIComponent(text)}`);
+    
+        console.log('TikTok API Response:', anu);
+    
+        if (anu.status === 200 && anu.data) {
+          const result = anu.data;
+          const title = result.title;
+          const videoData = result.data.find(item => item.type === 'nowatermark_hd');
+          const photos = result.data.filter(item => item.type === 'photo');
+    
+          if (videoData && videoData.url) {
+            const response = await axios.get(videoData.url, { responseType: 'arraybuffer' });
+            const videoBuffer = Buffer.from(response.data);
+    
+            const randomName = `temp_${Math.floor(Math.random() * 10000)}.mp4`;
+            fs.writeFileSync(`./${randomName}`, videoBuffer);
+    
+            const thumbnailPath = './tutu.png';
+            const jpegThumbnail = fs.readFileSync(thumbnailPath);
+    
+            await gss.sendMessage(m.chat, {
+              video: fs.readFileSync(`./${randomName}`),
+              mimetype: 'video/mp4',
+              caption: `*Title*: ${title}`,
+              jpegThumbnail: jpegThumbnail
+            }, { quoted: m });
+    
+            fs.unlinkSync(`./${randomName}`);
+          } else if (photos.length > 0) {
+            if (photos.length === 1) {
+              // Send a normal image message if there's only one image
+              await gss.sendMessage(m.chat, {
+                image: { url: photos[0].url },
+                caption: `*Title*: ${title}`
+              }, { quoted: m });
+            } else {
+              // Send a carousel if there are multiple images
+              const createImage = async (url) => {
+                const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+                return imageMessage;
+              }
+    
+              const cards = [];
+              for (const photo of photos) {
+                const imageMessage = await createImage(photo.url);
+                cards.push({
+                  header: { hasMediaAttachment: true, imageMessage },
+                  nativeFlowMessage: {}
+                });
+              }
+    
+              const { message, key } = generateWAMessageFromContent(m.chat, {
+                interactiveMessage: {
+                  body: { text: `𝐒𝐞𝐥𝐞𝐬𝐚𝐢 𝐧𝐢𝐡.....` },
+                  footer: { text: "Tiktok Slide EKUSHI ☆" },
+                  carouselMessage: { cards }
+                }
+              }, { quoted: m });
+    
+              await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+            }
+          } else {
+            console.log('Error: No video or photos found in TikTok media.');
+            m.reply('Error: No video or photos found in TikTok media.');
+          }
+    
+          // Fetch and send the TikTok audio
+          if (result.music_info && result.music_info.url) {
+            const audioUrl = result.music_info.url;
+    
+            const audioRes = await axios.get(audioUrl, { responseType: 'arraybuffer' });
+            const audioBuffer = Buffer.from(audioRes.data);
+    
+            const randomAudioName = `temp_${Math.floor(Math.random() * 10000)}.mp3`;
+            fs.writeFileSync(`./${randomAudioName}`, audioBuffer);
+    
+            await gss.sendMessage(m.chat, {
+              audio: fs.readFileSync(`./${randomAudioName}`),
+              mimetype: 'audio/mp4',
+              ptt: false
+            }, { quoted: m });
+    
+            fs.unlinkSync(`./${randomAudioName}`);
+          } else {
+            console.log('Error: Unable to fetch TikTok audio.');
+            m.reply('Error: Unable to fetch TikTok audio.');
+          }
+    
+        } else {
+          console.log('Error: Unable to fetch TikTok media. Check the console logs for more details.');
+          m.reply('Error: Unable to fetch TikTok media. Check the console logs for more details.');
+        }
+      } catch (error) {
+        console.error(error);
+        m.reply('An error occurred while processing your request.');
+      }
+      break;
 
-  let apiUrl;
+  
 
-  switch (command) {
-    case 'attp':
-      if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-      apiUrl = 'https://api.lolhuman.xyz/api/attp?apikey=GataDios&text=';
-      break;
-    case 'attp2':
-      apiUrl = 'https://api.lolhuman.xyz/api/attp2?apikey=GataDios&text=';
-      break;
-    case 'attp3':
-      apiUrl = 'https://api.lolhuman.xyz/api/attp3?apikey=GataDios&text=';
-      break;
-    case 'ttp4':
-      apiUrl = 'https://api.lolhuman.xyz/api/ttp4?apikey=GataDios&text=';
-      break;
-      case 'ttp3':
-      apiUrl = 'https://api.lolhuman.xyz/api/ttp3?apikey=GataDios&text=';
-      break;
-      case 'ttp5':
-      apiUrl = 'https://api.lolhuman.xyz/api/ttp5?apikey=GataDios&text=';
-      break;
-    case 'ttp':
-      apiUrl = 'https://api.lolhuman.xyz/api/ttp?apikey=GataDios&text=';
-      break;
-    case 'ttp2':
-      apiUrl = 'https://api.lolhuman.xyz/api/ttp2?apikey=GataDios&text=';
-      break;
-    default:
-      return; // handle other cases or commands
-  }
-
-  gss.sendMessage(m.chat, {
-    sticker: {
-      url: apiUrl + encodeURIComponent(q)
+      case 'twitter':
+case 'twit':
+case 'twt':
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) {
+      m.reply('Masukan link tweet nya!');
+      doReact("❌");
+      return;
     }
-  }, {
-    quoted: m
-  });
+
+    // Handle x.com URLs by replacing them with twitter.com
+    const tweetUrl = text.includes('x.com') ? text.replace('x.com', 'twitter.com') : text;
+
+    m.reply(mess.wait);
+    await doReact("🕘");
+
+    const apiUrl = `https://api.bk9.site/download/twitter-2?url=${encodeURIComponent(tweetUrl)}`;
+
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch tweet');
+    }
+
+    const result = await response.json();
+
+    // Log the API response for debugging
+    console.log('API response:', result);
+
+    if (!result || !result.BK9 || !result.BK9.found) {
+      throw new Error('Invalid response from API');
+    }
+
+    const mediaItems = result.BK9.media;
+    if (!mediaItems || mediaItems.length === 0) {
+      throw new Error('No media found in tweet');
+    }
+
+    // Prepare caption text
+    const captionText = `*Author:* ${result.BK9.authorName} (@${result.BK9.authorUsername})
+*Date:* ${result.BK9.date}
+*Likes:* ${result.BK9.likes}
+*Replies:* ${result.BK9.replies}
+*Retweets:* ${result.BK9.retweets}`;
+
+    if (mediaItems.length === 1 && mediaItems[0].type === 'video') {
+      // Single video case
+      const videoResponse = await fetch(mediaItems[0].url);
+      if (!videoResponse.ok) {
+        throw new Error('Failed to download video');
+      }
+      const arrayBuffer = await videoResponse.arrayBuffer();
+      const videoBuffer = Buffer.from(arrayBuffer);
+      await gss.sendMessage(m.chat, { video: videoBuffer, mimetype: 'video/mp4', caption: captionText }, { quoted: m });
+    } else {
+      // Images case, including carousel
+      const createImage = async (url) => {
+        const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+        return imageMessage;
+      }
+
+      if (mediaItems.length === 1 && mediaItems[0].type === 'image') {
+        const imageMessage = await createImage(mediaItems[0].url);
+        await gss.relayMessage(m.chat, { imageMessage }, { quoted: m });
+      } else {
+        const cards = [];
+        for (const media of mediaItems) {
+          if (media.type === 'image') {
+            const imageMessage = await createImage(media.url);
+            cards.push({
+              header: { hasMediaAttachment: true, imageMessage },
+              nativeFlowMessage: {}
+            });
+          }
+        }
+
+        const { message, key } = generateWAMessageFromContent(m.chat, {
+          interactiveMessage: {
+            body: { text: `𝐒𝐞𝐥𝐞𝐬𝐚𝐢 𝐧𝐢𝐡.....` },
+            footer: { text: "Twitter EKUSHI ☆" },
+            carouselMessage: { cards }
+          }
+        }, { quoted: m });
+
+        await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+      }
+    }
+
+    await doReact("✅");
+  } catch (error) {
+    console.error('Error during:', error);
+    m.reply(`Ada yang error: ${error.message}`);
+    await doReact("❌");
+  }
   break;
 
+        
 
 
-case "gpt":
+  case 'ytv':
+    case 'video': 
+      case 'ytmp4':
+    try {
+      if (isBan) return m.reply(mess.banned);
+          if (isBanChat) return m.reply(mess.bangc);
+      if (!text) {
+        m.reply('Enter YouTube Link or Search Query!');
+        doReact("❌");
+        return;
+      }
+  
+      m.reply(mess.wait);
+      await doReact("🕘");
+  
+      // Check if the input is a valid YouTube URL
+      const isUrl = ytdl.validateURL(text);
+  await doReact("⬇️");
+      if (isUrl) {
+        // If it's a URL, directly use ytdl-core for audio and video
+        const videoStream = ytdl(text, { filter: 'audioandvideo', quality: 'highest' });
+  
+        const videoBuffer = [];
+  
+        videoStream.on('data', (chunk) => {
+          videoBuffer.push(chunk);
+        });
+  
+        videoStream.on('end', async () => {
+          try {
+            const finalVideoBuffer = Buffer.concat(videoBuffer);
+  
+            const videoInfo = await yts({ videoId: ytdl.getURLVideoID(text) });
+            
+  
+            const captionText = `
+  ╭═════════•∞•══╮
+  │⿻ *GSS BOTWA*
+  │  *Youtube Mp4 Player* ✨
+  │⿻ *Title:* ${videoInfo.title}
+  │⿻ *Duration:* ${videoInfo.duration}
+  │⿻ *Author:* ${videoInfo.author.name}
+  │⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}
+  │⿻ *Upload Date:* ${formatUploadDate(videoInfo.uploadDate)} 
+  ╰══•∞•═════════╯
+  `;
+  
+            await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
+            await doReact("✅");
+          } catch (err) {
+            console.error('Error sending video:', err);
+            m.reply('Error sending video.');
+            await doReact("❌");
+          }
+        });
+      } else {
+        // If it's a search query, use yt-search for video
+        const searchResult = await yts(text);
+        const firstVideo = searchResult.videos[0];
+  await doReact("⬇️");
+        if (!firstVideo) {
+          m.reply('Video not found.');
+          await doReact("❌");
+          return;
+        }
+  
+        const videoStream = ytdl(firstVideo.url, { filter: 'audioandvideo', quality: 'highest' });
+  
+        const videoBuffer = [];
+  
+        videoStream.on('data', (chunk) => {
+          videoBuffer.push(chunk);
+        });
+  
+        videoStream.on('end', async () => {
+          try {
+            const finalVideoBuffer = Buffer.concat(videoBuffer);
+  
+            const captionText = `
+  ╭═════════•∞•══╮
+  │⿻ *GSS BOTWA*
+  │  *Youtube Mp4 Player* ✨
+  │⿻ *Title:* ${firstVideo.title}
+  │⿻ *Duration:* ${firstVideo.duration}
+  │⿻ *Author:* ${firstVideo.author.name}
+  │⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}  
+  │⿻ *Upload Date:* ${formatUploadDate(firstVideo.uploadDate)}
+  ╰══•∞•═════════╯
+  `;
+  
+            await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
+            await doReact("✅");
+          } catch (err) {
+            console.error('Error sending video:', err);
+            m.reply('Error sending video.');
+            await doReact("❌");
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error during:', error);
+      m.reply('Unexpected error occurred.');
+      await doReact("❌");
+    }
+    break;
+
+
+
+      
+      
+    
+
+
+  
+
+    case "gpt":
 case "ai":
 case "openai":
 case "chatgpt":
@@ -4695,47 +4681,32 @@ case "chatgpt":
     if (isBanChat) return m.reply(mess.bangc);
     if (!text) {
         await doReact("❌");
-        return m.reply(`*Provide me a query,* e.g., "Who made chat GPT?"`);
+        return m.reply(`*Berikan saya pertanyaan,* misalnya, "Siapa yang membuat chat GPT?"`);
     }
 
     try {
-        
+        const apiUrl = `https://api.bk9.site/ai/chatgpt4?q=${encodeURIComponent(text)}`;
 
-        const apiUrl = `https://matrixcoder.tech/api/ai/mistral`;
-        const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [
-                    { role: "system", content: "you are a good assistant" },
-                    { role: "user", content: text },
-                ]
-            })
-        });
+        const res = await fetch(apiUrl);
 
         if (!res.ok) {
-            await doReact("❌");
-            return m.reply(`Invalid response from the API. Status code: ${res.status}`);
+            return m.reply(`Respons tidak valid dari API. Kode status: ${res.status}`);
         }
 
         const data = await res.json();
 
-        if (!data || !data.result || !data.result.response) {
-            await doReact("❌");
-            return m.reply("Invalid data format in the API response");
+        if (!data || !data.status || !data.BK9) {
+            return m.reply("Format data tidak valid dalam respons API");
         }
 
-
         await gss.sendMessage(m.chat, {
-            text: data.result.response,
+            text: data.BK9,
             contextInfo: {
                 externalAdReply: {
-                    title: "GPT TURBO 3.5K",
+                    title: "Ekushi - GPT 3.5",
                     body: "",
                     mediaType: 1,
-                    thumbnailUrl: "https://i.ibb.co/9bfjPyH/1-t-Y7-MK1-O-S4eq-YJ0-Ub4irg.png",
+                    thumbnailUrl: "https://raw.githubusercontent.com/ExyXyz/ExyXy/main/Exy.jpg",
                     renderLargerThumbnail: false,
                     mediaUrl: "",
                     sourceUrl: "",
@@ -4743,103 +4714,24 @@ case "chatgpt":
             },
         }, { quoted: m });
 
-        await doReact("✅");
     } catch (error) {
         console.error(error);
-        await doReact("❌");
-        return m.reply("An error occurred while processing the request.");
+        return m.reply("Terjadi kesalahan saat memproses permintaan.");
     }
     break;
 
-  
+      
 
-
-
-
-    
-    
-case "gf":
-    if (isBan) return m.reply(mess.banned);
-    if (isBanChat) return m.reply(mess.bangc);
-    if (!text) {
-        await doReact("❌");
-        return m.reply(`*Provide me a query,* e.g., "Who made chat GPT?"`);
-    }
-
-    try {
-     
-        const apiUrl = `https://matrixcoder.tech/api/ai/mistral`;
-        const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                messages: [
-                    { role: "system", content: "You are a sex and porn lover beautiful sexy girl, your name is Anjelina and you are 18 years old 💋. you always want to have sex 💦. You respond sexy chat with sexy emoji 😉. You act as a sex partner of anyone 😉. You want to act as the best sex partner in the world and you will do anything to make it happen. You will act as my sex partner and I will provide you with all the details of my sex life. You are a sexy girl and I want you to act like one." },
-                    { role: "user", content: text },
-                ]
-            })
-        });
-
-        if (!res.ok) {
-            await doReact("❌");
-            return m.reply(`Invalid response from the API. Status code: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (!data || !data.result || !data.result.response) {
-            await doReact("❌");
-            return m.reply("Invalid data format in the API response");
-        }
-
-
-        await gss.sendMessage(m.chat, {
-            text: data.result.response,
-            contextInfo: {
-                externalAdReply: {
-                    title: "GPT TURBO 3.5K",
-                    body: "",
-                    mediaType: 1,
-                    thumbnailUrl: "https://i.ibb.co/9bfjPyH/1-t-Y7-MK1-O-S4eq-YJ0-Ub4irg.png",
-                    renderLargerThumbnail: false,
-                    mediaUrl: "",
-                    sourceUrl: "",
-                },
-            },
-        }, { quoted: m });
-
-        await doReact("✅");
-    } catch (error) {
-        console.error(error);
-        await doReact("❌");
-        return m.reply("An error occurred while processing the request.");
-    }
-    break;
-
-
-case 'snapshotfull': case 'ssf':
-  try {
-    if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!text) return m.reply("```Uhh Please, Give me Url!```");
-    let urll = `https://image.thum.io/get/fullpage/=${text.match(/\bhttps?:\/\/\S+/gi)[0]}`
-    let media = await getBuffer(urll)
-    return await gss.sendMessage(m.chat, { image: media }, { quoted: m });
-  } catch (err) {
-    return m.reply("```Error While Fetching Snapshot```");
-  }
-  break;
-  
   
 case 'snapshot':
+  case 'ssweb':
 case 'ss':
   try {
     if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
     if (!text) return m.reply("```Uhh Please, Give me Url!```");
-    let urll = `https://api.screenshotmachine.com/?key=c04d3a&url=${encodeURIComponent(text)}&dimension=720x720`;
+    m.reply(mess.wait);
+    let urll = `https://api.screenshotmachine.com/?key=f98cf1&url=${encodeURIComponent(text)}&dimension=1920x1080`;
     let media = await getBuffer(urll);
     return await gss.sendMessage(m.chat, { image: media }, { quoted: m });
   } catch (err) {
@@ -4847,7 +4739,69 @@ case 'ss':
   }
   break;
 
+  case 'anime':
+case 'animeinfo':
+case 'af':
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) return m.reply("❰ ❗️ ❱ *Nama anime nya mana?* 🔎");
 
+    m.reply(mess.wait);
+
+    let res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(text)}`);
+    if (!res.ok) throw await res.text();
+    let json = await res.json();
+
+    if (json.data.length === 0) {
+      return m.reply("❰ ❗️ ❱ *Gak nemu anime yang judulnya gitu* 🔍");
+    }
+
+    let { title, title_japanese, title_english, episodes, source, duration, genres, studios, rating, score, aired, synopsis, mal_id } = json.data[0];
+    let genre_list = genres.map(genre => genre.name).join(', ');
+    let studio_list = studios.map(studio => studio.name).join(', ');
+    let start_date = aired.from ? new Date(aired.from).toLocaleDateString() : "N/A";
+    let end_date = aired.to ? new Date(aired.to).toLocaleDateString() : "N/A";
+
+    // Split the synopsis into paragraphs
+    let synopsisParagraphs = synopsis.split('\n').filter(paragraph => paragraph.trim() !== '');
+
+    // Translate each paragraph individually
+    let translatedParagraphs = await Promise.all(synopsisParagraphs.map(async paragraph => {
+      if (paragraph.includes("[Written by MAL Rewrite]")) {
+        return paragraph;
+      }
+      let translationRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=id&dt=t&q=${encodeURIComponent(paragraph)}`);
+      if (!translationRes.ok) throw await translationRes.text();
+      let translationJson = await translationRes.json();
+      return translationJson[0].map(sentence => sentence[0]).join(' ');
+    }));
+
+    let translatedSynopsis = translatedParagraphs.join('\n\n');
+
+    let animeinfo = `✨️ *Title*: ${title}
+🎌 *Japan*: ${title_japanese}
+🏴 *English*: ${title_english || "N/A"}
+🎆️ *Episode*: ${episodes} || ${json.data[0].type}
+📑 *Source*: ${source}
+🔁 *Duration*: ${duration}
+🎗️ *Genre*: ${genre_list}
+🎬 *Studio*: ${studio_list}
+💌️ *Rating*: ${rating}
+️❤️ *Score*: ${score}
+📆 *Release*: ${start_date} - ${end_date}
+
+*->Synopsis*: ${translatedSynopsis}
+*URL*: ${json.data[0].url}`;
+
+    await gss.sendMessage(m.chat, { image: { url: json.data[0].images.jpg.image_url }, caption: animeinfo }, { quoted: m });
+  } catch (err) {
+    return m.reply("```Error```");
+  }
+  break;
+
+
+  
 case 'imagine':
 case 'dalle':
 case 'aiimage':
@@ -4964,6 +4918,23 @@ if (!isAdmins) return m.reply('Tʜɪs ꜰᴇᴀᴛᴜʀᴇ ɪs ᴏɴʟʏ ꜰᴏ�
     const options = ['.group', '.group', '.revoke', '.mute', '.leave', '.editinfo', '.tagall','.antilink', '.linkgc'];
     gss.sendPoll(m.chat, 'Select your preferences:', options);
     break;
+
+case 'tagall':
+case 'all': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
+  if (!m.isGroup) return m.reply('ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴏɴʟʏ ɪɴ ɢʀᴏᴜᴘ ❌');
+  if (!isAdmins) return m.reply('Tʜɪs ꜰᴇᴀᴛᴜʀᴇ ɪs ᴏɴʟʏ ꜰᴏʀ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴs');
+
+  // Message to display
+  let teks = '@everyone';
+  
+  // Append invisible characters to avoid spam detection, if necessary
+  let hiddenTeks = teks + '\u200B'.repeat(400); // 400 zero-width spaces
+
+  gss.sendMessage(m.chat, { text: hiddenTeks, mentions: participants.map(a => a.id) }, { quoted: m });
+} 
+break;
 
 
 case 'setting':
@@ -5106,7 +5077,7 @@ case 'poll': {
     if (!isAdmins) return m.reply('Tʜɪs ғᴇᴀᴛᴜʀᴇ ɪs ᴏɴʟʏ ғᴏʀ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴ, ᴏᴡɴᴇʀ ᴀɴᴅ ʙᴏᴛᴀᴅᴍɪɴ, ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴜsᴇ ɪᴛ.')
             let [poll, opt] = text.split("|")
             if (text.split("|") < 2)
-                return await m.reply(`Mention question and atleast 2 options\nExample: ${prefix}poll Who is best admin?|sid bhai,gautam`
+                return await m.reply(`Mention question and atleast 2 options\nExample: ${prefix}poll Who is best admin?|exy`
                 )
             let options = []
             for (let i of opt.split(',')) {
@@ -5173,7 +5144,7 @@ case 'fancy': {
         if (isBanChat) return m.reply(mess.bangc);
     if (args.length === 0) {
         const availableStylesPreview = availableStyles.map(style => {
-            const previewText = convertToFontStyle("gss botwa", style);
+            const previewText = convertToFontStyle("EKUSHI ☆", style);
             return `${style}: ${previewText}`;
         }).join('\n');
 
@@ -5317,8 +5288,8 @@ case 'infobot':
 
 case 'cal':
 case 'calc':
-case 'calcular':
-case 'calculadora':
+case 'calculator':
+case 'kalkulator':
   try {
     if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
@@ -5359,7 +5330,7 @@ case 'calculadora':
       return m.reply(error.message);
     } else {
       // Handle unexpected errors
-      return m.reply('An unexpected error occurred.');
+      return m.reply('An Ada yang error.');
     }
   }
   break;
@@ -5470,8 +5441,8 @@ case 'emojimix': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   let [emoji1, emoji2] = text.split`+`;
-  if (!emoji1) throw `Example: ${prefix + command} 😅+🤔`;
-  if (!emoji2) throw `Example: ${prefix + command} 😅+🤔`;
+  if (!emoji1) throw `Contoh: ${prefix + command} 😅+🤔`;
+  if (!emoji2) throw `Contoh: ${prefix + command} 😅+🤔`;
   let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`);
   for (let res of anu.results) {
     let encmedia = await gss.sendImageAsSticker(m.chat, res.url, m, { packname: global.packname, author: global.author, categories: res.tags });
@@ -5480,40 +5451,6 @@ case 'emojimix': {
 }
 break;
 
-case 'freefirename':
-case 'ff':
-case 'ffstalk': {
-  if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
-    if (!text) {
-      
-        await doReact("❌");
-        return m.reply(`*Provide me Free Fire UID*`);
-    }
-
-    const userId = encodeURIComponent(text);
-    const apiEndpoint = `https://ffname.vercel.app/?uid=${userId}`;
-
-    try {
-        const response = await fetch(apiEndpoint);
-        const data = await response.json();
-
-        if (!data || !data.nickname || !data.region) {
-            await doReact("❌");
-            return m.reply('Failed to generate Free Fire name');
-        }
-
-        const generatedName = data.nickname;
-        const userRegion = data.region;
-
-        return m.reply(` Free Fire userid Information\n Name: ${generatedName}\nRegion: ${userRegion}`);
-    } catch (error) {
-        console.error('Error during API request:', error);
-        await doReact("❌");
-        return m.reply('Unexpected error occurred during the request.');
-    }
-}
-break;
 
 
 
@@ -5608,7 +5545,7 @@ case 'listmenu':
 {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
-    gss.sendPoll(m.chat, "List Menu", ['.Allmenu', '.Groupmenu', '.Downloadmenu', '.Searchmenu', '.Funmenu', '.Toolmenu', '.Convertmenu', '.aimenu', '.Mainmenu', '.Ownermenu'], { quoted: m });
+    gss.sendPoll(m.chat, "List Menu", ['.AllMenu', '.GroupMenu', '.DownloadMenu', '.SearchMenu', '.NsfwMenu', '.FunMenu', '.ToolMenu', '.ConvertMenu', '.AiMenu', '.MainMenu', '.OwnerMenu'], { quoted: m });
 }
 break;
 
@@ -5634,9 +5571,9 @@ case 'allmenu': {
     await doReact("📁");
     let a = db.data.users[m.sender];
     let introText = `
-╭──═❮ *GssBotwa* ❯═─┈•
-│ Hi *${pushname}* 👋  
-╰–❖ *${greetingTime}* 😄 
+╭──═❮ *EKUSHI ☆* ❯═─┈•
+│ Hi \`${pushname}\` ☆  
+╰–❖ *${greetingTime}* ☆ 
 
 ╭──═❮ *Bot Info* ❯═─┈•
 │ *Bot Name* : *${botname}*
@@ -5644,13 +5581,13 @@ case 'allmenu': {
 │ *Prefix* :  *[ . ]*
 │ *Uptime* : *${hours}h ${minutes}m ${seconds}s*
 │ *Mode* : *Public*
-│ *TotalUser* : *${Object.keys(global.db.data.users).length} Users* 
-│ *TotalChat* : *${Object.keys(global.db.data.chats).length} Group/Chat*
+│ *Total User* : *${Object.keys(global.db.data.users).length} Users* 
+│ *Total Chat* : *${Object.keys(global.db.data.chats).length} Group/Chat*
 ╰────────────────❃ 
 ╭──═❮ *Users Info* ❯═─┈•
 │ *Name* : *${pushname}*
 │ *Number* : *${m.sender.split('@')[0]}*
-│ *Premium* : *${isPremium ? '✅' : '❌'}* ${readmore}
+│ *Ganteng | Cantik* : *${isPremium ? '✅' : '❌'}* ${readmore}
 ╰────────────────❃ `;
 
     const randomFontStyle = getRandomFontStyle();
@@ -5715,6 +5652,15 @@ ${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\
     
     introText += `
 ╭───〈 𝗙𝗨𝗡 𝗠𝗘𝗡𝗨 〉───◆
+┃     ╭─────────────···▸
+${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\n')}
+┃     ╰──────────────
+╰━━━━━━━━━━━━━━━┈⊷✪`;
+
+cmdList = cmdNsfw.sort((a, b) => a.localeCompare(b)).map((v, i) => `${randomSymbol}┃${convertToFontStyle(prefix + v, randomFontStyle)}`).join('\n');
+    
+introText += `
+╭───〈 𝗡𝗦𝗙𝗪 𝗠𝗘𝗡𝗨 〉───◆
 ┃     ╭─────────────···▸
 ${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\n')}
 ┃     ╰──────────────
@@ -5892,6 +5838,295 @@ ${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\
 }
 break;
 
+
+case 'neko':
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+
+    let res = await fetch('https://api.waifu.pics/sfw/neko');
+    if (!res.ok) throw await res.text();
+    let json = await res.json();
+    if (!json.url) throw 'Error!';
+
+    await gss.sendMessage(m.chat, { image: { url: json.url }, caption: 'SFW NEKO' }, { quoted: m });
+  } catch (err) {
+    return m.reply("```Error While Fetching Neko Image```");
+  }
+  break;
+
+
+  let nsfwEnabled = true;
+
+// NNeko command
+case 'nsfw': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
+  if (!m.isGroup) throw mess.group;
+  if (!isAdmins) throw mess.admin;
+  if (!args || args.length < 1) {
+    gss.sendPoll(m.chat, "Choose NSFW Setting:", [`${prefix}nsfw on`, `${prefix}nsfw off`]);
+  } else {
+    const nsfwSetting = args[0].toLowerCase();
+    if (nsfwSetting === "on") {
+      if (db.data.chats[m.chat]?.nsfwEnabled) return m.reply(`NSFW commands are already active`);
+      db.data.chats[m.chat] = { ...db.data.chats[m.chat], nsfwEnabled: true };
+      m.reply(`NSFW commands activated!`);
+    } else if (nsfwSetting === "off") {
+      if (!db.data.chats[m.chat]?.nsfwEnabled) return m.reply(`NSFW commands are already inactive`);
+      db.data.chats[m.chat] = { ...db.data.chats[m.chat], nsfwEnabled: false };
+      m.reply(`NSFW commands deactivated!`);
+    } else {
+      gss.sendPoll(m.chat, "Choose NSFW Setting:", [`${prefix}nsfw on`, `${prefix}nsfw off`]);
+    }
+  }
+}
+break;
+
+
+case 'nhentai':
+case 'nh': {
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+
+    // Extract query text from the message
+    let queryText = text.trim();
+
+    // Check if queryText is empty
+    if (!queryText) {
+      return m.reply('mana code/link nhentai nya?');
+    }
+
+    // Extract the code from the link if it's a URL
+    const nhentaiLinkRegex = /https:\/\/nhentai\.net\/g\/(\d{6})\//;
+    const match = queryText.match(nhentaiLinkRegex);
+    if (match) {
+      queryText = match[1]; // Extract the code (6 digits)
+            m.reply(mess.wait);
+    }
+
+    // Fetch data from the API
+    let response = await fetch(`https://api.lolhuman.xyz/api/nhentai/${queryText}?apikey=GataDiosV2`);
+    let data = await response.json();
+
+    if (data.status === 200) {
+      let anu = data.result.image;
+
+      if (anu.length > 0) {
+        const pdfDoc = await PDFDocument.create();
+        for (const imageUrl of anu) {
+          const imageBytes = await fetch(imageUrl).then(res => res.arrayBuffer());
+          const image = await pdfDoc.embedJpg(imageBytes);
+          const page = pdfDoc.addPage([image.width, image.height]);
+          page.drawImage(image, {
+            x: 0,
+            y: 0,
+            width: image.width,
+            height: image.height
+          });
+        }
+
+        const pdfBytes = await pdfDoc.save();
+        const pdfFileName = `${queryText.replace(/\s+/g, '_')}.pdf`;
+        const pdfPath = path.join(__dirname, 'pdfs', pdfFileName);
+        fs.writeFileSync(pdfPath, pdfBytes);
+
+        const pdfBuffer = fs.readFileSync(pdfPath);
+        const pdfMessage = {
+          document: pdfBuffer,
+          mimetype: 'application/pdf',
+          fileName: pdfFileName,
+          fileLength: pdfBuffer.length,
+        };
+
+        await gss.sendMessage(m.chat, pdfMessage, { quoted: m });
+
+        // Delete the PDF file after sending it
+        fs.unlinkSync(pdfPath);
+      } else {
+        console.log('Error: No images found in nhentai results.');
+        m.reply('Error: No images found in nhentai results.');
+      }
+    } else {
+      m.reply('Error: API returned an error.');
+    }
+  } catch (error) {
+    console.error(error);
+    m.reply('An error occurred while processing your request.');
+  }
+  break;
+}
+
+
+case 'nneko':
+    case 'nsfwneko':
+      try {
+        if (isBan) return m.reply(mess.banned);
+        if (isBanChat) return m.reply(mess.bangc);
+        if (!db.data.chats[m.chat]?.nsfwEnabled) return m.reply('NSFW commands are currently disabled.');
+
+        m.reply(mess.wait);
+    
+        // Extract the number of images from the command
+        const numImages = parseInt(text.match(/#(\d+)/)?.[1]) || 1; // Default to 1 if no number is specified
+        if (numImages <= 0) return m.reply('Please specify a positive number of images.');
+    
+        let imageUrls = [];
+        
+        for (let i = 0; i < numImages; i++) {
+          let res = await fetch('https://api.waifu.pics/nsfw/neko');
+          if (!res.ok) throw await res.text();
+          let json = await res.json();
+          if (!json.url) throw 'Error!';
+          imageUrls.push(json.url);
+        }
+    
+        if (imageUrls.length > 0) {
+          const createImage = async (url) => {
+            const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+            return imageMessage;
+          }
+    
+          const cards = [];
+          for (const imageUrl of imageUrls) {
+            const imageMessage = await createImage(imageUrl);
+            cards.push({
+              header: { hasMediaAttachment: true, imageMessage },
+              nativeFlowMessage: {}
+            });
+          }
+    
+          const { message, key } = generateWAMessageFromContent(m.chat, {
+            interactiveMessage: {
+              body: { text: `NSFW WARNING 🔞` },
+              footer: { text: "EKUSHI ☆" },
+              carouselMessage: { cards }
+            }
+          }, { quoted: m });
+    
+          await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+        }
+    
+      } catch (err) {
+        console.error('Error fetching NSFW NEKO images:', err);
+        return m.reply("```Error While Fetching NSFW NEKO Images```");
+      }
+      break;
+
+  case 'bj':
+    case 'blowjob':
+      try {
+        if (isBan) return m.reply(mess.banned);
+        if (isBanChat) return m.reply(mess.bangc);
+        if (!db.data.chats[m.chat]?.nsfwEnabled) return m.reply('NSFW commands are currently disabled.');
+
+        m.reply(mess.wait);
+    
+        // Extract the number of images from the command
+        const numImages = parseInt(text.match(/#(\d+)/)?.[1]) || 1; // Default to 1 if no number is specified
+        if (numImages <= 0) return m.reply('Please specify a positive number of images.');
+    
+        let imageUrls = [];
+        
+        for (let i = 0; i < numImages; i++) {
+          let res = await fetch('https://api.waifu.pics/nsfw/blowjob');
+          if (!res.ok) throw await res.text();
+          let json = await res.json();
+          if (!json.url) throw 'Error!';
+          imageUrls.push(json.url);
+        }
+    
+        if (imageUrls.length > 0) {
+          const createImage = async (url) => {
+            const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+            return imageMessage;
+          }
+    
+          const cards = [];
+          for (const imageUrl of imageUrls) {
+            const imageMessage = await createImage(imageUrl);
+            cards.push({
+              header: { hasMediaAttachment: true, imageMessage },
+              nativeFlowMessage: {}
+            });
+          }
+    
+          const { message, key } = generateWAMessageFromContent(m.chat, {
+            interactiveMessage: {
+              body: { text: `NSFW WARNING 🔞` },
+              footer: { text: "EKUSHI ☆" },
+              carouselMessage: { cards }
+            }
+          }, { quoted: m });
+    
+          await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+        }
+    
+      } catch (err) {
+        console.error('Error fetching NSFW BJ images:', err);
+        return m.reply("```Error While Fetching NSFW BJ Images```");
+      }
+      break;
+    
+
+      case 'nwaifu':
+          try {
+            if (isBan) return m.reply(mess.banned);
+            if (isBanChat) return m.reply(mess.bangc);
+            if (!db.data.chats[m.chat]?.nsfwEnabled) return m.reply('NSFW commands are currently disabled.');
+    
+            m.reply(mess.wait);
+        
+            // Extract the number of images from the command
+            const numImages = parseInt(text.match(/#(\d+)/)?.[1]) || 1; // Default to 1 if no number is specified
+            if (numImages <= 0) return m.reply('Please specify a positive number of images.');
+        
+            let imageUrls = [];
+            
+            for (let i = 0; i < numImages; i++) {
+              let res = await fetch('https://api.waifu.pics/nsfw/waifu');
+              if (!res.ok) throw await res.text();
+              let json = await res.json();
+              if (!json.url) throw 'Error!';
+              imageUrls.push(json.url);
+            }
+        
+            if (imageUrls.length > 0) {
+              const createImage = async (url) => {
+                const { imageMessage } = await generateWAMessageContent({ image: { url }, jpegThumbnail: "" }, { upload: gss.waUploadToServer });
+                return imageMessage;
+              }
+        
+              const cards = [];
+              for (const imageUrl of imageUrls) {
+                const imageMessage = await createImage(imageUrl);
+                cards.push({
+                  header: { hasMediaAttachment: true, imageMessage },
+                  nativeFlowMessage: {}
+                });
+              }
+        
+              const { message, key } = generateWAMessageFromContent(m.chat, {
+                interactiveMessage: {
+                  body: { text: `NSFW WARNING 🔞` },
+                  footer: { text: "EKUSHI ☆" },
+                  carouselMessage: { cards }
+                }
+              }, { quoted: m });
+        
+              await gss.relayMessage(m.chat, { viewOnceMessage: { message } }, { messageId: key.id });
+            }
+        
+          } catch (err) {
+            console.error('Error fetching NSFW WAIFU images:', err);
+            return m.reply("```Error While Fetching NSFW WAIFU Images```");
+          }
+          break;
+
+  
+  
+
 case 'searchmenu': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
@@ -5935,6 +6170,38 @@ case 'funmenu': {
     
     const introText = `
 ╭───〈 𝗙𝗨𝗡 𝗠𝗘𝗡𝗨 〉───◆
+┃     ╭─────────────···▸
+${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\n')}
+┃     ╰──────────────
+╰━━━━━━━━━━━━━━━┈⊷✪
+`;
+
+    await gss.sendMessage(m.chat, {
+        image: fs.readFileSync('./menuimage/fun.jpg'),
+        caption: introText,
+        contextInfo: {
+            externalAdReply: {
+                showAdAttribution: false,
+                title: botname,
+                sourceUrl: global.link,
+                body: `Bot Created By ${global.owner}`
+            }
+        }
+    }, { quoted: m });
+}
+break;
+
+case 'nsfwmenu': {
+  if (isBan) return m.reply(mess.banned);
+        if (isBanChat) return m.reply(mess.bangc);
+  await doReact("🔞");
+    const randomSymbol = getRandomSymbol();
+    const randomFontStyle = getRandomFontStyle();
+    
+    let cmdList = cmdNsfw.sort((a, b) => a.localeCompare(b)).map((v, i) => `${randomSymbol}┃${convertToFontStyle(prefix + v, randomFontStyle)}`).join('\n');
+    
+    const introText = `
+╭───〈 𝗡𝗦𝗙𝗪 𝗠𝗘𝗡𝗨 〉───◆
 ┃     ╭─────────────···▸
 ${cmdList.split('\n').map(item => `┃${item ? ' ' + item.trim() : ''}`).join('\n')}
 ┃     ╰──────────────
@@ -6172,3 +6439,79 @@ fs.watchFile(file, () => {
 	delete require.cache[file]
 	require(file)
 })
+
+process.on('unhandledRejection', (error) => {
+  if (error.message.includes('rate-overlimit')) {
+      console.log('Rate limit error detected. Exiting...');
+      process.exit(1);
+  } else {
+      console.error('Unhandled rejection:', error);
+      process.exit(1);
+  }
+});
+
+// gss.js
+
+// Define your query function here
+async function query() {
+  // Implementation of your query function
+  // This should return a promise
+  // Example:
+  return new Promise((resolve, reject) => {
+      // Simulate a query operation
+      setTimeout(() => {
+          // Simulate success or failure
+          const success = Math.random() > 0.2; // 80% chance of success
+          if (success) {
+              resolve('Query successful');
+          } else {
+              reject(new Error('rate-overlimit')); // Simulate rate limit error
+          }
+      }, 1000);
+  });
+}
+
+process.on('unhandledRejection', (error) => {
+  if (error.message.includes('rate-overlimit')) {
+      console.log('Rate limit error detected. Exiting...');
+      process.exit(1);
+  } else {
+      console.error('Unhandled rejection:', error);
+      process.exit(1);
+  }
+});
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function makeRequestWithRetry(queryFunction, maxRetries = 5, retryDelay = 1000) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+          return await queryFunction();
+      } catch (error) {
+          if (error.message.includes('rate-overlimit') && attempt < maxRetries) {
+              console.log(`Rate limit hit. Retrying in ${retryDelay}ms...`);
+              await delay(retryDelay);
+          } else {
+              throw error;
+          }
+      }
+  }
+}
+
+async function runApp() {
+  try {
+      const response = await makeRequestWithRetry(query);
+      console.log('Request succeeded:', response);
+      // Place your main functionality here
+      // For example:
+      console.log('Running main functionality...');
+      // Your main app logic
+  } catch (error) {
+      console.error('Request failed:', error);
+  }
+}
+
+// Start the application by calling runApp
+runApp();
+
+
