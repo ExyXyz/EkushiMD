@@ -1,5 +1,5 @@
 { 
-  "name": "gss botwa",
+  "name": "Ekushi Bot",
   "version": "1.2.5",
   "description": "WhatsApp Using Lib Baileys Multi Device",
   "main": "index.js",
@@ -18,7 +18,7 @@
     "bot-md",
     "multi-device"
   ],
-  "author": "sid bhai.",
+  "author": "Ekushi.",
   "license": "MIT",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
@@ -99,6 +99,7 @@
     "ytdl-core": "^4.11.5",
     "youtubedl-core": "^4.11.4",
     "ytsr": "^3.8.4"
+    "@distube/ytdl-core": "^4.13.5"
   },
   "directories": {
     "lib": "lib",
