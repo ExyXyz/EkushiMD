@@ -2994,10 +2994,12 @@ case '𝐀𝐮𝐝𝐢𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭': {
 
 case '𝐕𝐢𝐝𝐞𝐨': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
     return m.reply('Please specify the unique key for video playback. Use the format: video [unique-key]');
   }
+
+  m.reply(mess.wait);
 
   const match = text.match(/(\d+)\.(\d+)/);
 
@@ -3015,45 +3017,104 @@ case '𝐕𝐢𝐝𝐞𝐨': {
 
     if (selectedUrl) {
       try {
-        // Fetch video info for additional details
         const videoInfo = await ytdl.getInfo(selectedUrl);
 
-        // Get the video thumbnail
-        const thumbnailUrl = videoInfo.videoDetails.thumbnails[0].url;
+        const formatDuration = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
 
-        // Construct caption with video details
         const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
-        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A'; 
+        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+        const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
 
-const captionText = `
+        const captionText = `
 ╭═════════•∞•══╮
-│⿻ *GSS BOTWA*
-│  *Youtube Mp4 Player* ✨
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
 │⿻ *Title:* ${title}
 │⿻ *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
-│⿻ *Duration:* ${videoInfo.videoDetails.lengthSeconds}s
+│⿻ *Duration:* ${formattedDuration}
 │⿻ *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
 │⿻ *Upload Date:* ${uploadDate}
 ╰══•∞•═════════╯
 `;
 
+        const ffmpeg = require('fluent-ffmpeg');
+        const fs = require('fs');
+        const path = require('path');
 
-        // Download audio and video together using 'videoandaudio' filter
-        const videoAndAudioStream = ytdl(selectedUrl, { quality: 'highest', filter: 'audioandvideo' });
+        const getRandomFileName = () => `file_${Math.floor(Math.random() * 1000) + 1}.mp4`;
 
-        // Convert the stream to buffer
-        const videoAndAudioBuffer = await streamToBuffer(videoAndAudioStream);
+        const tempDir = '/temp';
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir);
+        }
 
-        // Send the video and audio as a media message with caption
+        const videoFilePath = path.resolve(tempDir, getRandomFileName());
+        const audioFilePath = path.resolve(tempDir, getRandomFileName());
+        const outputFilePath = path.resolve(tempDir, getRandomFileName());
+
+        const downloadStreamToFile = (stream, filePath) => {
+          return new Promise((resolve, reject) => {
+            const writeStream = fs.createWriteStream(filePath);
+            stream.pipe(writeStream);
+            stream.on('end', () => resolve());
+            stream.on('error', (error) => reject(error));
+          });
+        };
+
+        const getBestFormat = (formats, isVideo, maxSize = Infinity) => {
+          const filteredFormats = formats
+            .filter(format => format.container === 'mp4')
+            .filter(format => isVideo ? format.hasVideo : format.hasAudio)
+            .filter(format => isVideo ? format.qualityLabel <= '1080p60' : true)
+            .filter(format => parseInt(format.contentLength) <= maxSize);
+          return filteredFormats[0];
+        };
+
+        const videoFormat = getBestFormat(videoInfo.formats, true, 90 * 1024 * 1024);
+        const audioFormat = getBestFormat(videoInfo.formats, false);
+
+        const videoStream = ytdl(selectedUrl, { format: videoFormat });
+        const audioStream = ytdl(selectedUrl, { format: audioFormat });
+
+        await Promise.all([
+          downloadStreamToFile(videoStream, videoFilePath),
+          downloadStreamToFile(audioStream, audioFilePath)
+        ]);
+
+        await new Promise((resolve, reject) => {
+          ffmpeg()
+            .input(videoFilePath)
+            .input(audioFilePath)
+            .outputOptions('-c:v copy')
+            .outputOptions('-c:a aac')
+            .output(outputFilePath)
+            .on('end', () => resolve())
+            .on('error', (error) => reject(error))
+            .run();
+        });
+
+        const videoBuffer = fs.readFileSync(outputFilePath);
+
         await gss.sendMessage(m.chat, {
-          video: videoAndAudioBuffer,
+          video: videoBuffer,
           mimetype: 'video/mp4',
           caption: captionText,
         }, { quoted: m });
-        
+
+        // Cleanup temporary files
+        fs.unlinkSync(videoFilePath);
+        fs.unlinkSync(audioFilePath);
+        fs.unlinkSync(outputFilePath);
+
+        return doReact("✅");
       } catch (error) {
         console.error('Error during video playback:', error);
-        return m.reply('Unexpected error occurred during video playback.');
+        m.reply('Unexpected error occurred during video playback.');
+        return doReact("❌");
       }
     } else {
       return m.reply('Invalid sub-option. Please choose a valid sub-option.');
@@ -3064,12 +3125,17 @@ const captionText = `
   break;
 }
 
+
+
+
 case '𝐕𝐢𝐝𝐞𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭': {
   if (isBan) return m.reply(mess.banned);
-        if (isBanChat) return m.reply(mess.bangc);
+  if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
     return m.reply('Please specify the unique key for video playback. Use the format: video [unique-key]');
   }
+
+  m.reply(mess.wait);
 
   const match = text.match(/(\d+)\.(\d+)/);
 
@@ -3087,42 +3153,96 @@ case '𝐕𝐢𝐝𝐞𝐨𝐝𝐨𝐜𝐮𝐦𝐞𝐧𝐭': {
 
     if (selectedUrl) {
       try {
-        // Fetch video info for additional details
         const videoInfo = await ytdl.getInfo(selectedUrl);
 
-        // Get the video thumbnail
-        const thumbnailUrl = videoInfo.videoDetails.thumbnails[0].url;
+        const formatDuration = (seconds) => {
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        };
 
-        // Construct caption with video details
         const title = videoInfo.title || (videoInfo.videoDetails && videoInfo.videoDetails.title) || 'N/A';
-        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A'; 
+        const uploadDate = formatUploadDate(videoInfo.videoDetails.uploadDate) || 'N/A';
+        const formattedDuration = formatDuration(videoInfo.videoDetails.lengthSeconds);
 
-const captionText = `
- *Video In Document* ✨
- *Title:* ${title}
- *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
- *Duration:* ${videoInfo.videoDetails.lengthSeconds}s
- *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
-*Upload Date:* ${uploadDate}
+        const captionText = `
+╭═════════•∞•══╮
+│⿻ *EKUSHI ☆*
+│  *Youtube Video Document* 
+│⿻ *Title:* ${title}
+│⿻ *Author:* ${videoInfo.videoDetails.author.name || 'N/A'}
+│⿻ *Duration:* ${formattedDuration}
+│⿻ *Views:* ${videoInfo.videoDetails.viewCount.toLocaleString() || 'N/A'}
+│⿻ *Upload Date:* ${uploadDate}
+╰══•∞•═════════╯
 `;
 
+        const getBestFormat = (formats, isVideo, maxSize = Infinity) => {
+          const filteredFormats = formats
+            .filter(format => format.container === 'mp4')
+            .filter(format => isVideo ? format.hasVideo : format.hasAudio)
+            .filter(format => isVideo ? format.qualityLabel <= '1080p60' : true)
+            .filter(format => parseInt(format.contentLength) <= maxSize);
+          return filteredFormats[0];
+        };
 
-        // Download audio and video together using 'videoandaudio' filter
-        const videoAndAudioStream = ytdl(selectedUrl, { quality: 'highest', filter: 'audioandvideo' });
+        const videoFormat = getBestFormat(videoInfo.formats, true, 90 * 1024 * 1024);
+        const audioFormat = getBestFormat(videoInfo.formats, false);
 
-        // Convert the stream to buffer
-        const videoAndAudioBuffer = await streamToBuffer(videoAndAudioStream);
+        const videoStream = ytdl(selectedUrl, { format: videoFormat });
+        const audioStream = ytdl(selectedUrl, { format: audioFormat });
 
-        // Send the video and audio as a media message with caption
+        const downloadStreamToBuffer = (stream) => {
+          return new Promise((resolve, reject) => {
+            const chunks = [];
+            stream.on('data', chunk => chunks.push(chunk));
+            stream.on('end', () => resolve(Buffer.concat(chunks)));
+            stream.on('error', (error) => reject(error));
+          });
+        };
+
+        const videoBuffer = await downloadStreamToBuffer(videoStream);
+        const audioBuffer = await downloadStreamToBuffer(audioStream);
+
+        const tempDir = '/temp';
+        const videoFilePath = path.resolve(tempDir, getRandomFileName());
+        const audioFilePath = path.resolve(tempDir, getRandomFileName());
+        const outputFilePath = path.resolve(tempDir, getRandomFileName());
+
+        fs.writeFileSync(videoFilePath, videoBuffer);
+        fs.writeFileSync(audioFilePath, audioBuffer);
+
+        await new Promise((resolve, reject) => {
+          ffmpeg()
+            .input(videoFilePath)
+            .input(audioFilePath)
+            .outputOptions('-c:v copy')
+            .outputOptions('-c:a aac')
+            .output(outputFilePath)
+            .on('end', () => resolve())
+            .on('error', (error) => reject(error))
+            .run();
+        });
+
+        const finalBuffer = fs.readFileSync(outputFilePath);
+
         await gss.sendMessage(m.chat, {
-  document: videoAndAudioBuffer,
-  mimetype: 'video/mp4',
-  fileName: `${title}.mp4`,
-  caption: captionText,
-}, { quoted: m });
+          document: finalBuffer,
+          mimetype: 'video/mp4',
+          fileName: `${title}.mp4`,
+          caption: captionText,
+        }, { quoted: m });
+
+        // Cleanup temporary files
+        fs.unlinkSync(videoFilePath);
+        fs.unlinkSync(audioFilePath);
+        fs.unlinkSync(outputFilePath);
+
+        return doReact("✅");
       } catch (error) {
         console.error('Error during video playback:', error);
-        return m.reply('Unexpected error occurred during video playback.');
+        m.reply('Unexpected error occurred during video playback.');
+        return doReact("❌");
       }
     } else {
       return m.reply('Invalid sub-option. Please choose a valid sub-option.');
@@ -4558,111 +4678,191 @@ case 'twt':
         
 
 
-  case 'ytv':
-    case 'video': 
-      case 'ytmp4':
-    try {
-      if (isBan) return m.reply(mess.banned);
-          if (isBanChat) return m.reply(mess.bangc);
-      if (!text) {
-        m.reply('Enter YouTube Link or Search Query!');
-        doReact("❌");
-        return;
-      }
-  
-      m.reply(mess.wait);
-      await doReact("🕘");
-  
-      // Check if the input is a valid YouTube URL
-      const isUrl = ytdl.validateURL(text);
-  await doReact("⬇️");
-      if (isUrl) {
-        // If it's a URL, directly use ytdl-core for audio and video
-        const videoStream = ytdl(text, { filter: 'audioandvideo', quality: 'highest' });
-  
-        const videoBuffer = [];
-  
-        videoStream.on('data', (chunk) => {
-          videoBuffer.push(chunk);
-        });
-  
-        videoStream.on('end', async () => {
-          try {
-            const finalVideoBuffer = Buffer.concat(videoBuffer);
-  
-            const videoInfo = await yts({ videoId: ytdl.getURLVideoID(text) });
-            
-  
-            const captionText = `
-  ╭═════════•∞•══╮
-  │⿻ *GSS BOTWA*
-  │  *Youtube Mp4 Player* ✨
-  │⿻ *Title:* ${videoInfo.title}
-  │⿻ *Duration:* ${videoInfo.duration}
-  │⿻ *Author:* ${videoInfo.author.name}
-  │⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}
-  │⿻ *Upload Date:* ${formatUploadDate(videoInfo.uploadDate)} 
-  ╰══•∞•═════════╯
-  `;
-  
-            await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
-            await doReact("✅");
-          } catch (err) {
-            console.error('Error sending video:', err);
-            m.reply('Error sending video.');
-            await doReact("❌");
-          }
-        });
-      } else {
-        // If it's a search query, use yt-search for video
-        const searchResult = await yts(text);
-        const firstVideo = searchResult.videos[0];
-  await doReact("⬇️");
-        if (!firstVideo) {
-          m.reply('Video not found.');
-          await doReact("❌");
+  case 'ytmp4':
+    case 'ytv':
+    case 'yt':
+      try {
+        if (isBan) return m.reply(mess.banned);
+        if (isBanChat) return m.reply(mess.bangc);
+        if (!text) {
+          m.reply('Masukan link video YouTube nya!');
+          doReact("❌");
           return;
         }
-  
-        const videoStream = ytdl(firstVideo.url, { filter: 'audioandvideo', quality: 'highest' });
-  
-        const videoBuffer = [];
-  
-        videoStream.on('data', (chunk) => {
-          videoBuffer.push(chunk);
-        });
-  
-        videoStream.on('end', async () => {
-          try {
-            const finalVideoBuffer = Buffer.concat(videoBuffer);
-  
-            const captionText = `
-  ╭═════════•∞•══╮
-  │⿻ *GSS BOTWA*
-  │  *Youtube Mp4 Player* ✨
-  │⿻ *Title:* ${firstVideo.title}
-  │⿻ *Duration:* ${firstVideo.duration}
-  │⿻ *Author:* ${firstVideo.author.name}
-  │⿻ *Size:* ${formatBytes(finalVideoBuffer.length)}  
-  │⿻ *Upload Date:* ${formatUploadDate(firstVideo.uploadDate)}
-  ╰══•∞•═════════╯
-  `;
-  
-            await gss.sendMessage(m.chat, { video: finalVideoBuffer, mimetype: 'video/mp4', caption: captionText });
-            await doReact("✅");
-          } catch (err) {
-            console.error('Error sending video:', err);
-            m.reply('Error sending video.');
-            await doReact("❌");
+    
+        m.reply(mess.wait);
+        await doReact("🕘");
+    
+        const ytdl = require('@distube/ytdl-core');
+        const yts = require('yt-search');
+        const ffmpeg = require('fluent-ffmpeg');
+        const fs = require('fs');
+        const path = require('path');
+    
+        // Read cookies from the file
+        const cookies = fs.readFileSync('cookies.txt', 'utf8');
+    
+        const getRandomFileName = () => `file_${Math.floor(Math.random() * 1000) + 1}.mp4`;
+    
+        const tempDir = '/temp';
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir);
+        }
+    
+        const videoFilePath = path.resolve(tempDir, getRandomFileName());
+        const audioFilePath = path.resolve(tempDir, getRandomFileName());
+        const outputFilePath = path.resolve(tempDir, getRandomFileName());
+    
+        const downloadStreamToFile = (stream, filePath) => {
+          return new Promise((resolve, reject) => {
+            const writeStream = fs.createWriteStream(filePath);
+            stream.pipe(writeStream);
+            stream.on('end', () => resolve());
+            stream.on('error', (error) => reject(error));
+          });
+        };
+    
+        const isUrl = ytdl.validateURL(text);
+    
+        const getBestFormat = (formats, isVideo, maxSize = Infinity) => {
+          const filteredFormats = formats
+            .filter(format => format.container === 'mp4')
+            .filter(format => isVideo ? format.hasVideo : format.hasAudio)
+            .filter(format => isVideo ? format.qualityLabel <= '1080p60' : true)
+            .filter(format => parseInt(format.contentLength) <= maxSize);
+          return filteredFormats[0];
+        };
+    
+        const formatBytes = (bytes) => {
+          if (bytes === 0) return '0 Bytes';
+          const k = 1024;
+          const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        };
+    
+        const formatUploadDate = (date) => {
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          return new Date(date).toLocaleDateString(undefined, options);
+        };
+    
+        const downloadAndSendVideo = async (videoUrl, videoTitle, videoThumbnail, videoTimestamp, videoUploader, videoUploadDate) => {
+          const info = await ytdl.getInfo(videoUrl, {
+            requestOptions: {
+              headers: {
+                cookie: cookies
+              }
+            }
+          });
+          let videoFormat = getBestFormat(info.formats, true);
+          let audioFormat = getBestFormat(info.formats, false);
+    
+          if (parseInt(videoFormat.contentLength) > 90 * 1024 * 1024) { // 90MB
+            videoFormat = getBestFormat(info.formats, true, 90 * 1024 * 1024);
           }
-        });
+    
+          const videoStream = ytdl(videoUrl, { format: videoFormat, requestOptions: { headers: { cookie: cookies } } });
+          const audioStream = ytdl(videoUrl, { format: audioFormat, requestOptions: { headers: { cookie: cookies } } });
+    
+          await Promise.all([
+            downloadStreamToFile(videoStream, videoFilePath),
+            downloadStreamToFile(audioStream, audioFilePath)
+          ]);
+    
+          await new Promise((resolve, reject) => {
+            ffmpeg()
+              .input(videoFilePath)
+              .input(audioFilePath)
+              .outputOptions('-c:v copy')
+              .outputOptions('-c:a aac')
+              .output(outputFilePath)
+              .on('end', () => resolve())
+              .on('error', (error) => reject(error))
+              .run();
+          });
+    
+          const videoBuffer = fs.readFileSync(outputFilePath);
+    
+          const thumbnailMessage = {
+            image: {
+              url: videoThumbnail,
+            },
+            caption: `
+      ╭═════════•∞•══╮
+      │⿻ *EKUSHI ☆*
+      │  *Youtube Player* ✨
+      │⿻ *Title:* ${videoTitle}
+      │⿻ *Duration:* ${videoTimestamp}
+      │⿻ *Uploader:* ${videoUploader}
+      │⿻ *Size:* ${formatBytes(videoBuffer.length)}
+      │⿻ *Upload Date:* ${formatUploadDate(videoUploadDate)}
+      ╰══•∞•═════════╯
+            `,
+          };
+    
+          await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
+          await gss.sendMessage(m.chat, { video: videoBuffer, mimetype: 'video/mp4', caption: `Selesai Mendownload: ${videoTitle}` }, { quoted: m });
+          await doReact("✅");
+    
+          fs.unlinkSync(videoFilePath);
+          fs.unlinkSync(audioFilePath);
+          fs.unlinkSync(outputFilePath);
+        };
+    
+        if (isUrl) {
+          const videoId = ytdl.getURLVideoID(text);
+          const videoInfo = await ytdl.getInfo(videoId, {
+            requestOptions: {
+              headers: {
+                cookie: cookies
+              }
+            }
+          });
+    
+          if (videoInfo.videoDetails.isLiveContent) {
+            m.reply('Nuh uh Gabisa download Live disini');
+            await doReact("❌");
+            return;
+          }
+    
+          const { video_url, title, thumbnail, lengthSeconds, author, uploadDate } = videoInfo.videoDetails;
+          const videoTimestamp = `${Math.floor(lengthSeconds / 60)}:${lengthSeconds % 60}`;
+          
+          await downloadAndSendVideo(video_url, title, thumbnail.thumbnails[0].url, videoTimestamp, author.name, uploadDate);
+        } else {
+          const searchResult = await yts(text);
+          const firstVideo = searchResult.videos[0];
+    
+          if (!firstVideo) {
+            m.reply('Gak nemu videonya.');
+            await doReact("❌");
+            return;
+          }
+    
+          const { url, title, thumbnail, timestamp, author, uploadDate } = firstVideo;
+          
+          const videoInfo = await ytdl.getInfo(url, {
+            requestOptions: {
+              headers: {
+                cookie: cookies
+              }
+            }
+          });
+          if (videoInfo.videoDetails.isLiveContent) {
+            m.reply('Nuh uh Gabisa download Live disini');
+            await doReact("❌");
+            return;
+          }
+    
+          await downloadAndSendVideo(url, title, thumbnail, timestamp, author.name, uploadDate);
+        }
+      } catch (error) {
+        console.error('Error during video processing:', error);
+        m.reply('Ada yang error.');
+        await doReact("❌");
       }
-    } catch (error) {
-      console.error('Error during:', error);
-      m.reply('Unexpected error occurred.');
-      await doReact("❌");
-    }
-    break;
+      break;
+    
 
 
 
