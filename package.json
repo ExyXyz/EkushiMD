@@ -1,5 +1,5 @@
 { 
-  "name": "Ekushi BOT",
+  "name": "gss botwa",
   "version": "1.2.5",
   "description": "WhatsApp Using Lib Baileys Multi Device",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "keywords": [
     "termux",
     "whatsapp",
-    "2024",
+    "2023",
     "wabase-md",
     "base",
     "baileys-md",
@@ -18,7 +18,7 @@
     "bot-md",
     "multi-device"
   ],
-  "author": "Exy.",
+  "author": "sid bhai.",
   "license": "MIT",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
@@ -98,7 +98,6 @@
     "yt-search": "^2.10.4",
     "ytdl-core": "^4.11.5",
     "youtubedl-core": "^4.11.4",
-    "@distube/ytdl-core": "^4.13.5",
     "ytsr": "^3.8.4"
   },
   "directories": {
@@ -107,11 +106,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ExyXyz/Ekushi-Bot.git"
+    "url": "git+https://github.com/gssbotwa/Gss_Botwa2.git"
   },
   "bugs": {
-    "url": "https://github.com/ExyXyz/Ekushi-Bot/issues"
+    "url": "https://github.com/gssbotwa/Gss_Botwa2/issues"
   },
-  "homepage": "https://github.com/ExyXyz/Ekushi-Bot#readme"
+  "homepage": "https://github.com/gssbotwa/Gss_Botwa2#readme"
 }
  
