@@ -2444,9 +2444,9 @@ case 'sfy':
     
 
 
-  case 'yta':
-case 'song':
-case 'ytmp3':
+  case '301280yta':
+case '301280song':
+case '301280ytmp3':
   try {
     if (isBan) return m.reply(mess.banned);
     if (isBanChat) return m.reply(mess.bangc);
@@ -2589,9 +2589,9 @@ case 'ytmp3':
 
 
 
-case 'ytadoc':
-case 'songdoc':
-case 'ytmp3doc':
+case '301280ytadoc':
+case '301280songdoc':
+case '301280ytmp3doc':
   try {
     if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
@@ -2706,7 +2706,7 @@ case 'ytmp3doc':
 
 
 
-case 'yts': case 'ytsearch': case 'play': {
+case '301280yts': case '301280ytsearch': case '301280play': {
   if (isBan) return m.reply(mess.banned);
         if (isBanChat) return m.reply(mess.bangc);
   if (!text) {
@@ -4678,9 +4678,9 @@ case 'twt':
         
 
 
-    case 'ytmp4':
-case 'ytv':
-case 'yt': {
+    case '301280ytmp4':
+case '301280ytv':
+case '301280yt': {
   try {
     if (isBan) return m.reply(mess.banned);
     if (isBanChat) return m.reply(mess.bangc);
@@ -4842,14 +4842,6 @@ case 'yt': {
   }
   break;
 }
-
-
-
-      
-      
-    
-
-
   
 
     case "gpt":
@@ -6082,7 +6074,7 @@ case 'nh': {
     const match = queryText.match(nhentaiLinkRegex);
     if (match) {
       queryText = match[1]; // Extract the code (6 digits)
-            m.reply(mess.wait);
+      m.reply(mess.wait);
     }
 
     // Fetch data from the API
@@ -6091,12 +6083,23 @@ case 'nh': {
 
     if (data.status === 200) {
       let anu = data.result.image;
+      let title = data.result.title_romaji || data.result.title_native;
 
       if (anu.length > 0) {
         const pdfDoc = await PDFDocument.create();
         for (const imageUrl of anu) {
           const imageBytes = await fetch(imageUrl).then(res => res.arrayBuffer());
-          const image = await pdfDoc.embedJpg(imageBytes);
+
+          let image;
+          if (imageUrl.endsWith('.jpg') || imageUrl.endsWith('.jpeg')) {
+            image = await pdfDoc.embedJpg(imageBytes);
+          } else if (imageUrl.endsWith('.png')) {
+            image = await pdfDoc.embedPng(imageBytes);
+          } else {
+            console.log(`Unsupported image format: ${imageUrl}`);
+            continue;
+          }
+
           const page = pdfDoc.addPage([image.width, image.height]);
           page.drawImage(image, {
             x: 0,
@@ -6107,16 +6110,31 @@ case 'nh': {
         }
 
         const pdfBytes = await pdfDoc.save();
-        const pdfFileName = `${queryText.replace(/\s+/g, '_')}.pdf`;
+        const pdfFileName = `${title.replace(/\s+/g, '_')}.pdf`;
         const pdfPath = path.join(__dirname, 'pdfs', pdfFileName);
         fs.writeFileSync(pdfPath, pdfBytes);
 
         const pdfBuffer = fs.readFileSync(pdfPath);
+
+        // Get the first image as thumbnail
+        const thumbnailUrl = anu[0];
+
         const pdfMessage = {
           document: pdfBuffer,
           mimetype: 'application/pdf',
           fileName: pdfFileName,
           fileLength: pdfBuffer.length,
+          contextInfo: {
+            externalAdReply: {
+              title: queryText,
+              body: title,
+              mediaType: 1,
+              thumbnailUrl: thumbnailUrl,
+              renderLargerThumbnail: true,
+              mediaUrl: '',
+              sourceUrl: '',
+            },
+          },
         };
 
         await gss.sendMessage(m.chat, pdfMessage, { quoted: m });
@@ -6136,6 +6154,8 @@ case 'nh': {
   }
   break;
 }
+
+
 
 
 case 'nneko':
