@@ -6074,8 +6074,9 @@ case 'nh': {
     const match = queryText.match(nhentaiLinkRegex);
     if (match) {
       queryText = match[1]; // Extract the code (6 digits)
-      m.reply(mess.wait);
     }
+
+    m.reply(mess.wait);
 
     // Fetch data from the API
     let response = await fetch(`https://api.lolhuman.xyz/api/nhentai/${queryText}?apikey=GataDiosV2`);
