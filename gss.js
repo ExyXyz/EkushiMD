@@ -6074,9 +6074,8 @@ case 'nh': {
     const match = queryText.match(nhentaiLinkRegex);
     if (match) {
       queryText = match[1]; // Extract the code (6 digits)
+      m.reply(mess.wait);
     }
-
-    m.reply(mess.wait);
 
     // Fetch data from the API
     let response = await fetch(`https://api.lolhuman.xyz/api/nhentai/${queryText}?apikey=GataDiosV2`);
@@ -6089,15 +6088,17 @@ case 'nh': {
       if (anu.length > 0) {
         const pdfDoc = await PDFDocument.create();
         for (const imageUrl of anu) {
-          const imageBytes = await fetch(imageUrl).then(res => res.arrayBuffer());
+          const imageResponse = await fetch(imageUrl);
+          const imageBytes = await imageResponse.arrayBuffer();
 
+          const contentType = imageResponse.headers.get('content-type');
           let image;
-          if (imageUrl.endsWith('.jpg') || imageUrl.endsWith('.jpeg')) {
+          if (contentType === 'image/jpeg') {
             image = await pdfDoc.embedJpg(imageBytes);
-          } else if (imageUrl.endsWith('.png')) {
+          } else if (contentType === 'image/png') {
             image = await pdfDoc.embedPng(imageBytes);
           } else {
-            console.log(`Unsupported image format: ${imageUrl}`);
+            console.log(`Unsupported image format: ${contentType}`);
             continue;
           }
 
@@ -6111,7 +6112,7 @@ case 'nh': {
         }
 
         const pdfBytes = await pdfDoc.save();
-        const pdfFileName = `${title.replace(/\s+/g, '_')}.pdf`;
+        const pdfFileName = `${queryText}.pdf`;
         const pdfPath = path.join(__dirname, 'pdfs', pdfFileName);
         fs.writeFileSync(pdfPath, pdfBytes);
 
@@ -6155,6 +6156,7 @@ case 'nh': {
   }
   break;
 }
+
 
 
 
