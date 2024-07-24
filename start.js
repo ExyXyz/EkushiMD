@@ -8,18 +8,34 @@ function logWithColor(message) {
 }
 
 function startApp() {
-    const app = spawn('node', ['index.js'], { stdio: 'inherit' });
+    const app = spawn('node', ['index.js'], { stdio: ['inherit', 'inherit', 'pipe'] });
+
+    app.stderr.on('data', (data) => {
+        const errorMessage = data.toString();
+        console.error(errorMessage); // Log the error message
+        if (errorMessage.includes("TypeError: Cannot destructure property 'user' of '(0 , WABinary_1.jidDecode)(...)' as it is undefined.")) {
+            logWithColor('Detected specific error. Restarting application...');
+            app.kill(); // This will terminate the current running app
+            startApp(); // This will start the app again
+        }
+    });
 
     app.on('close', (code) => {
-        logWithColor(`Application exited with code ${code}`);
+        const exitMessage = `Application exited with code ${code}`;
+        logWithColor(exitMessage);
+
+        // Check if the exit message contains "Application exited with code"
+        if (exitMessage.includes('Application exited with code')) {
+            logWithColor('Detected exit code message. Restarting application...');
+            startApp(); // This will start the app again
+        }
     });
 
     setTimeout(() => {
-        logWithColor('Restarting application...');
+        logWithColor('Restarting application due to timeout...');
         app.kill(); // This will terminate the current running app
         startApp(); // This will start the app again
     }, 3600000); // 1 hour = 3600000 milliseconds
 }
 
 startApp();
-
