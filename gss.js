@@ -781,7 +781,7 @@ during ${clockString(new Date - user.afkTime)}`)
         const cmdAi = ["Ai", "Bug", "Report", "Gpt", "Dalle"];
 const cmdTool = ["Tempmail", "Checkmail", "Info", "ssweb", "Trt", "Tts"];
 const cmdGrup = ["LinkGroup", "Setppgc", "Setname", "Setdesc", "Group", "Gcsetting", "Welcome", "Left", "SetWelcome", "SetLeft", "Editinfo", "Add", "Kick", "HideTag", "Nsfw", "Tagall", "Totag", "Tagadmin", "AntiLink", "AntiToxic", "Mute", "Promote", "Demote", "Revoke", "Poll", "Getbio"];
-const cmdDown = ["Apk", "Facebook", "Mediafire", "Nhentai", "Pinterestdl", "Gitclone", "Gdrive", "Twitter", "Instagram", "Ytmp3", "Ytmp4", "Play", "Song", "Video", "Ytmp3doc", "Tiktok", "TiktokHD"];
+const cmdDown = ["Apk", "Facebook", "Mediafire", "Pixeldrain", "Nhentai", "Pinterestdl", "Gitclone", "Gdrive", "Twitter", "Instagram", "Ytmp3", "Ytmp4", "Play", "Song", "Video", "Ytmp3doc", "Tiktok", "TiktokHD"];
 const cmdSearch = ["Play", "Yts", "Imdb", "Anime", "Google", "Pinterest", "Wikimedia", "Ytsearch", "Ringtone", "Lyrics", "Neko"];
 const cmdNsfw = ["NNeko", "NWaifu", "Blowjob"];
 const cmdFun = ["Delttt", "Tictactoe"];
@@ -2441,7 +2441,200 @@ case 'sfy':
   }
   break;
 
-    
+  case 'yta':
+case 'ytmp3':
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) {
+      m.reply('Masukan link video YouTube nya!');
+      doReact("❌");
+      return;
+    }
+
+    m.reply(mess.wait);
+    await doReact("🕘");
+
+    // Validate YouTube URL
+    const isUrl = ytdl.validateURL(text);
+
+    if (isUrl) {
+      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=audio&quality=128kbps&apikey=ExyXyz`;
+      
+      // Fetching data from the API
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.status) {
+        const { title, thumbnail, channel, data: { filename, url } } = data;
+
+        const audioMessage = {
+          audio: { url },
+          mimetype: 'audio/mpeg',
+          fileName: filename,
+          contextInfo: {
+            externalAdReply: {
+              title: title,
+              body: channel,
+              mediaType: 1,
+              thumbnailUrl: thumbnail,
+              renderLargerThumbnail: false
+            },
+          },
+        };
+
+        const docMessage = {
+          document: { url },
+          mimetype: 'audio/mpeg',
+          fileName: filename
+        };
+
+        await gss.sendMessage(m.chat, audioMessage, { quoted: m });
+        await gss.sendMessage(m.chat, docMessage);
+        await doReact("✅");
+      } else {
+        m.reply('Gagal mengambil data dari API.');
+        await doReact("❌");
+      }
+    } else {
+      // Handle non-URL search queries
+      m.reply('Masukan link video YouTube yang valid.');
+      await doReact("❌");
+    }
+  } catch (error) {
+    console.error('Error during:', error);
+    m.reply('Ada yang error.');
+    await doReact("❌");
+  }
+  break;
+
+  case 'song':
+    try {
+      if (isBan) return m.reply(mess.banned);
+      if (isBanChat) return m.reply(mess.bangc);
+      if (!text) {
+        m.reply('Masukan judul lagu atau artis!');
+        doReact("❌");
+        return;
+      }
+  
+      m.reply(mess.wait);
+      await doReact("🕘");
+  
+      // Construct the API URL with the query
+      const apiUrl = `https://api.neoxr.eu/api/play-v2?q=${encodeURIComponent(text)}&apikey=ExyXyz`;
+  
+      // Fetching data from the API
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+  
+      if (data.status) {
+        const { title, thubmnail, channel, data: { filename, url } } = data;
+  
+        const audioMessage = {
+          audio: { url },
+          mimetype: 'audio/mpeg',
+          fileName: filename,
+          contextInfo: {
+            externalAdReply: {
+              title: title,
+              body: channel,
+              mediaType: 1,
+              thumbnailUrl: thubmnail,
+              renderLargerThumbnail: false
+            },
+          },
+        };
+  
+        const docMessage = {
+          document: { url },
+          mimetype: 'audio/mpeg',
+          fileName: filename
+        };
+  
+        await gss.sendMessage(m.chat, audioMessage, { quoted: m });
+        await gss.sendMessage(m.chat, docMessage);
+        await doReact("✅");
+      } else {
+        m.reply('Gagal mengambil data dari API.');
+        await doReact("❌");
+      }
+    } catch (error) {
+      console.error('Error during:', error);
+      m.reply('Ada yang error.');
+      await doReact("❌");
+    }
+    break;
+  
+    case 'ytmp4':
+      case 'ytv':
+        case 'yt':
+          case 'video':
+  try {
+    if (isBan) return m.reply(mess.banned);
+    if (isBanChat) return m.reply(mess.bangc);
+    if (!text) {
+      m.reply('Masukan link video YouTube nya!');
+      doReact("❌");
+      return;
+    }
+
+    m.reply(mess.wait);
+    await doReact("🕘");
+
+    const fetchVideoData = async (quality) => {
+      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=video&quality=${quality}&apikey=ExyXyz`;
+      const response = await fetch(apiUrl);
+      return response.json();
+    };
+
+    const qualities = ['1080p60', '1080p', '720p60', '720p', '480p', '360p', '240p'];
+    let videoData;
+    for (const quality of qualities) {
+      videoData = await fetchVideoData(quality);
+      if (videoData.status) break;
+    }
+
+    if (videoData.status) {
+      const { title: videoTitle, thumbnail: videoThumbnail, duration: videoTimestamp, channel: videoUploader, publish: videoUploadDate, data: { filename, url, size } } = videoData;
+
+      const thumbnailMessage = {
+        image: { url: videoThumbnail },
+        caption: `
+╭═════════•∞•══╮
+│⿻ *EKUSHI ☆*
+│  *Youtube Player* 
+│⿻ *Title:* ${videoTitle}
+│⿻ *Duration:* ${videoTimestamp}
+│⿻ *Uploader:* ${videoUploader}
+│⿻ *Size:* ${size}
+│⿻ *Upload Date:* ${videoUploadDate}
+╰══•∞•═════════╯
+        `,
+      };
+
+      const videoMessage = {
+        video: { url },
+        mimetype: 'video/mp4',
+        fileName: filename,
+      };
+
+      await gss.sendMessage(m.chat, thumbnailMessage, { quoted: m });
+      await gss.sendMessage(m.chat, videoMessage);
+      await doReact("✅");
+    } else {
+      m.reply('Gagal mengambil data dari API.');
+      await doReact("❌");
+    }
+  } catch (error) {
+    console.error('Error during video processing:', error);
+    m.reply('Ada yang error.');
+    await doReact("❌");
+  }
+  break;
+
+
+
 
 
   case '301280yta':
@@ -3797,8 +3990,8 @@ case 'mediafire': {
         const fileInfo = await mediafireDl(text);
 
         // Check if the file size is too big
-        if (fileInfo[0].size.split('MB')[0] >= 100) {
-            return m.reply('Walah, file nya terlalu gede maximum nya cuman 100MB');
+        if (fileInfo[0].size.split('MB')[0] >= 500) {
+            return m.reply('Walah, file nya terlalu gede maximum nya cuman 500MB');
         }
 
         // Send the file to the user with a caption
@@ -3823,6 +4016,62 @@ case 'mediafire': {
     break;
 }
 
+case 'pixeldrain':
+  case 'pd': {
+  if (isBan) return m.reply(mess.banned);
+  if (isBanChat) return m.reply(mess.bangc);
+  
+  // Check if the command has arguments
+  if (args.length === 0) {
+    return m.reply(`Link nya manah? \n\nContoh: ${prefix + command} https://pixeldrain.com/u/abcd1234`);
+  }
+
+  // Check if the argument is a valid Pixeldrain link
+  if (!isUrl(args[0]) || !args[0].includes('pixeldrain.com')) {
+    return m.reply(`Link yang kamu kasih salah/rusak`);
+  }
+
+  // Reply with a "Please wait..." message
+  await m.reply(mess.wait);
+
+  try {
+    // Fetch file information from Pixeldrain API
+    const response = await fetch(`https://api.neoxr.eu/api/pixeldrain?url=${encodeURIComponent(args[0])}&apikey=ExyXyz`);
+    const result = await response.json();
+    console.log(result);  // Add this line to see the entire response in the console
+
+    if (!result.data) {
+      return m.reply('Failed to fetch file information from Pixeldrain.');
+    }
+
+    const fileInfo = result.data;
+
+    // Check if the file size is too big
+    if (parseFloat(fileInfo.size.split(' ')[0]) >= 500) {
+      return m.reply('Walah, file nya terlalu gede maximum nya cuman 500MB');
+    }
+
+    // Send the file to the user with a caption
+    gss.sendMessage(
+      m.chat,
+      {
+        document: {
+          url: fileInfo.url,
+        },
+        fileName: fileInfo.filename,
+        mimetype: `application/${fileInfo.type}`,
+        caption: `Selesai mendownload:\n\n ${fileInfo.filename}`,  // Add your desired caption
+      },
+      { quoted: m }
+    );
+  } catch (error) {
+    // Handle any errors that may occur during the process
+    console.error('Error in Pixeldrain download:', error);
+    m.reply(`An error occurred: ${error.message}`);
+  }
+
+  break;
+}
 
 
 case 'invite': case 'add': {
@@ -5097,11 +5346,9 @@ case 'all': {
   if (!m.isGroup) return m.reply('ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴏɴʟʏ ɪɴ ɢʀᴏᴜᴘ ❌');
   if (!isAdmins) return m.reply('Tʜɪs ꜰᴇᴀᴛᴜʀᴇ ɪs ᴏɴʟʏ ꜰᴏʀ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴs');
 
-  // Message to display
   let teks = '@everyone';
   
-  // Append invisible characters to avoid spam detection, if necessary
-  let hiddenTeks = teks + '\u200B'.repeat(400); // 400 zero-width spaces
+  let hiddenTeks = teks + '\u200B'.repeat(400); 
 
   gss.sendMessage(m.chat, { text: hiddenTeks, mentions: participants.map(a => a.id) }, { quoted: m });
 } 
