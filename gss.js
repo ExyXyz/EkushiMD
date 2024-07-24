@@ -2459,7 +2459,7 @@ case 'ytmp3':
     const isUrl = ytdl.validateURL(text);
 
     if (isUrl) {
-      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=audio&quality=128kbps&apikey=ExyXyz`;
+      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=audio&quality=128kbps&apikey=placeyourapikeyhere`;
       
       // Fetching data from the API
       const response = await fetch(apiUrl);
@@ -2522,7 +2522,7 @@ case 'ytmp3':
       await doReact("🕘");
   
       // Construct the API URL with the query
-      const apiUrl = `https://api.neoxr.eu/api/play-v2?q=${encodeURIComponent(text)}&apikey=ExyXyz`;
+      const apiUrl = `https://api.neoxr.eu/api/play-v2?q=${encodeURIComponent(text)}&apikey=placeyourapikeyhere`;
   
       // Fetching data from the API
       const response = await fetch(apiUrl);
@@ -2583,7 +2583,7 @@ case 'ytmp3':
     await doReact("🕘");
 
     const fetchVideoData = async (quality) => {
-      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=video&quality=${quality}&apikey=ExyXyz`;
+      const apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(text)}&type=video&quality=${quality}&apikey=placeyourapikeyhere`;
       const response = await fetch(apiUrl);
       return response.json();
     };
@@ -4036,7 +4036,7 @@ case 'pixeldrain':
 
   try {
     // Fetch file information from Pixeldrain API
-    const response = await fetch(`https://api.neoxr.eu/api/pixeldrain?url=${encodeURIComponent(args[0])}&apikey=ExyXyz`);
+    const response = await fetch(`https://api.neoxr.eu/api/pixeldrain?url=${encodeURIComponent(args[0])}&apikey=placeyourapikeyhere`);
     const result = await response.json();
     console.log(result);  // Add this line to see the entire response in the console
 
