@@ -20,22 +20,12 @@ function startApp() {
         }
     });
 
-    app.on('close', (code) => {
-        const exitMessage = `Application exited with code ${code}`;
-        logWithColor(exitMessage);
-
-        // Check if the exit message contains "Application exited with code"
-        if (exitMessage.includes('Application exited with code')) {
-            logWithColor('Detected exit code message. Restarting application...');
-            startApp(); // This will start the app again
-        }
-    });
 
     setTimeout(() => {
         logWithColor('Restarting application due to timeout...');
         app.kill(); // This will terminate the current running app
         startApp(); // This will start the app again
-    }, 3600000); // 1 hour = 3600000 milliseconds
+    }, 1300000); // 1 hour = 3600000 milliseconds
 }
 
 startApp();
