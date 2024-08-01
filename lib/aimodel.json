@@ -1,0 +1,322 @@
+{
+    "creator": "@neoxr.js – Wildan Izzudin",
+    "status": true,
+    "data": [
+      {
+        "model_id": 1,
+        "ids": "3Guofeng3_v34.safetensors [50f420de]",
+        "name": "3 Guofeng3 V3.4"
+      },
+      {
+        "model_id": 2,
+        "ids": "absolutereality_V16.safetensors [37db0fc3]",
+        "name": "Absolute Reality V1.6"
+      },
+      {
+        "model_id": 3,
+        "ids": "absolutereality_v181.safetensors [3d9d4d2b]",
+        "name": "Absolute Reality V1.8.1"
+      },
+      {
+        "model_id": 4,
+        "ids": "amIReal_V41.safetensors [0a8a2e61]",
+        "name": "Am I Real V4.1"
+      },
+      {
+        "model_id": 5,
+        "ids": "analog-diffusion-1.0.ckpt [9ca13f02]",
+        "name": "Analog V1"
+      },
+      {
+        "model_id": 6,
+        "ids": "anythingv3_0-pruned.ckpt [2700c435]",
+        "name": "Anything V3"
+      },
+      {
+        "model_id": 7,
+        "ids": "anything-v4.5-pruned.ckpt [65745d25]",
+        "name": "Anything V4.5"
+      },
+      {
+        "model_id": 8,
+        "ids": "anythingV5_PrtRE.safetensors [893e49b9]",
+        "name": "Anything V5"
+      },
+      {
+        "model_id": 9,
+        "ids": "AOM3A3_orangemixs.safetensors [9600da17]",
+        "name": "AbyssOrangeMix V3"
+      },
+      {
+        "model_id": 10,
+        "ids": "blazing_drive_v10g.safetensors [ca1c1eab]",
+        "name": "Blazing Drive V10g"
+      },
+      {
+        "model_id": 11,
+        "ids": "breakdomain_I2428.safetensors [43cc7d2f]",
+        "name": "BreakDomain I2428"
+      },
+      {
+        "model_id": 12,
+        "ids": "breakdomain_M2150.safetensors [15f7afca]",
+        "name": "BreakDomain M2150"
+      },
+      {
+        "model_id": 13,
+        "ids": "cetusMix_Version35.safetensors [de2f2560]",
+        "name": "CetusMix Version35"
+      },
+      {
+        "model_id": 14,
+        "ids": "childrensStories_v13D.safetensors [9dfaabcb]",
+        "name": "Children's Stories V1 3D"
+      },
+      {
+        "model_id": 15,
+        "ids": "childrensStories_v1SemiReal.safetensors [a1c56dbb]",
+        "name": "Children's Stories V1 SemiReal"
+      },
+      {
+        "model_id": 16,
+        "ids": "childrensStories_v1ToonAnime.safetensors [2ec7b88b]",
+        "name": "Children's Stories V1 Toon-Anime"
+      },
+      {
+        "model_id": 17,
+        "ids": "Counterfeit_v30.safetensors [9e2a8f19]",
+        "name": "Counterfeit V3.0"
+      },
+      {
+        "model_id": 18,
+        "ids": "cuteyukimixAdorable_midchapter3.safetensors [04bdffe6]",
+        "name": "CuteYukimix MidChapter3"
+      },
+      {
+        "model_id": 19,
+        "ids": "cyberrealistic_v33.safetensors [82b0d085]",
+        "name": "CyberRealistic V3.3"
+      },
+      {
+        "model_id": 20,
+        "ids": "dalcefo_v4.safetensors [425952fe]",
+        "name": "Dalcefo V4"
+      },
+      {
+        "model_id": 21,
+        "ids": "deliberate_v2.safetensors [10ec4b29]",
+        "name": "Deliberate V2"
+      },
+      {
+        "model_id": 22,
+        "ids": "deliberate_v3.safetensors [afd9d2d4]",
+        "name": "Deliberate V3"
+      },
+      {
+        "model_id": 23,
+        "ids": "dreamlike-anime-1.0.safetensors [4520e090]",
+        "name": "Dreamlike Anime V1"
+      },
+      {
+        "model_id": 24,
+        "ids": "dreamlike-diffusion-1.0.safetensors [5c9fd6e0]",
+        "name": "Dreamlike Diffusion V1"
+      },
+      {
+        "model_id": 25,
+        "ids": "dreamlike-photoreal-2.0.safetensors [fdcf65e7]",
+        "name": "Dreamlike Photoreal V2"
+      },
+      {
+        "model_id": 26,
+        "ids": "dreamshaper_6BakedVae.safetensors [114c8abb]",
+        "name": "Dreamshaper 6 baked vae"
+      },
+      {
+        "model_id": 27,
+        "ids": "dreamshaper_7.safetensors [5cf5ae06]",
+        "name": "Dreamshaper 7"
+      },
+      {
+        "model_id": 28,
+        "ids": "dreamshaper_8.safetensors [9d40847d]",
+        "name": "Dreamshaper 8"
+      },
+      {
+        "model_id": 29,
+        "ids": "edgeOfRealism_eorV20.safetensors [3ed5de15]",
+        "name": "Edge of Realism EOR V2.0"
+      },
+      {
+        "model_id": 30,
+        "ids": "EimisAnimeDiffusion_V1.ckpt [4f828a15]",
+        "name": "Eimis Anime Diffusion V1.0"
+      },
+      {
+        "model_id": 31,
+        "ids": "elldreths-vivid-mix.safetensors [342d9d26]",
+        "name": "Elldreth's Vivid"
+      },
+      {
+        "model_id": 32,
+        "ids": "epicphotogasm_xPlusPlus.safetensors [1a8f6d35]",
+        "name": "epiCPhotoGasm X Plus Plus"
+      },
+      {
+        "model_id": 33,
+        "ids": "epicrealism_naturalSinRC1VAE.safetensors [90a4c676]",
+        "name": "EpiCRealism Natural Sin RC1"
+      },
+      {
+        "model_id": 34,
+        "ids": "epicrealism_pureEvolutionV3.safetensors [42c8440c]",
+        "name": "EpiCRealism Pure Evolution V3"
+      },
+      {
+        "model_id": 35,
+        "ids": "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
+        "name": "I Cant Believe Its Not Photography Seco"
+      },
+      {
+        "model_id": 36,
+        "ids": "indigoFurryMix_v75Hybrid.safetensors [91208cbb]",
+        "name": "Indigo Furry Mix V7.5 Hybrid"
+      },
+      {
+        "model_id": 37,
+        "ids": "juggernaut_aftermath.safetensors [5e20c455]",
+        "name": "Juggernaut Aftermath"
+      },
+      {
+        "model_id": 38,
+        "ids": "lofi_v4.safetensors [ccc204d6]",
+        "name": "Lofi V4"
+      },
+      {
+        "model_id": 39,
+        "ids": "lyriel_v16.safetensors [68fceea2]",
+        "name": "Lyriel V1.6"
+      },
+      {
+        "model_id": 40,
+        "ids": "majicmixRealistic_v4.safetensors [29d0de58]",
+        "name": "MajicMix Realistic V4"
+      },
+      {
+        "model_id": 41,
+        "ids": "mechamix_v10.safetensors [ee685731]",
+        "name": "MechaMix V1.0"
+      },
+      {
+        "model_id": 42,
+        "ids": "meinamix_meinaV9.safetensors [2ec66ab0]",
+        "name": "MeinaMix Meina V9"
+      },
+      {
+        "model_id": 43,
+        "ids": "meinamix_meinaV11.safetensors [ca6dff67]",
+        "name": "MeinaMix Meina V11"
+      },
+      {
+        "model_id": 44,
+        "ids": "neverendingDream_v122.safetensors [52d5b8cc]",
+        "name": "Neverending Dream V1.22"
+      },
+      {
+        "model_id": 45,
+        "ids": "openjourney_v4.safetensors [ca7d934f]",
+        "name": "Openjourney V4"
+      },
+      {
+        "model_id": 46,
+        "ids": "pastel-mix.safetensors [c689aa15]",
+        "name": "Pastel-Mix"
+      },
+      {
+        "model_id": 47,
+        "ids": "portraitPlus_v1.safetensors [780151b5]",
+        "name": "Portrait+ V1"
+      },
+      {
+        "model_id": 48,
+        "ids": "protogen_x34Photorealism.safetensors [e2a3d3a2]",
+        "name": "Protogen x3.4"
+      },
+      {
+        "model_id": 49,
+        "ids": "realisticVision_v14.safetensors [c93c7d5f]",
+        "name": "Realistic Vision V1.4"
+      },
+      {
+        "model_id": 50,
+        "ids": "realisticVision_v20.safetensors [84cde9c4]",
+        "name": "Realistic Vision V2.0"
+      },
+      {
+        "model_id": 51,
+        "ids": "realisticVision_v40.safetensors [0e0e5e45]",
+        "name": "Realistic Vision V4.0"
+      },
+      {
+        "model_id": 52,
+        "ids": "realisticVision_v50.safetensors [c64bb9cb]",
+        "name": "Realistic Vision V5.0"
+      },
+      {
+        "model_id": 53,
+        "ids": "redshiftDiffusion_v10.safetensors [c0ec86e2]",
+        "name": "Redshift Diffusion V1.0"
+      },
+      {
+        "model_id": 54,
+        "ids": "reV_animatedV122.safetensors [cbe0fbc5]",
+        "name": "ReV Animated V1.2.2"
+      },
+      {
+        "model_id": 55,
+        "ids": "rundiffusionFx_2.5DV1.safetensors [2068f0d5]",
+        "name": "RunDiffusion FX 2.5D V1.0"
+      },
+      {
+        "model_id": 56,
+        "ids": "rundiffusionFx_photorealisticV1.safetensors [edfa00a1]",
+        "name": "RunDiffusion FX Photorealistic V1.0"
+      },
+      {
+        "model_id": 57,
+        "ids": "sd-v1-4.ckpt [7460a6fa]",
+        "name": "SD V1.4"
+      },
+      {
+        "model_id": 58,
+        "ids": "sd-v1-5.ckpt [56f49891]",
+        "name": "SD V1.5"
+      },
+      {
+        "model_id": 59,
+        "ids": "sd-v1-5-inpainting.ckpt [bbd23aa6]",
+        "name": "SD V1.5 Inpainting"
+      },
+      {
+        "model_id": 60,
+        "ids": "shoninsBeautifulPeople_v10.safetensors [c7847a9d]",
+        "name": "Shonin's Beautiful People V1.0"
+      },
+      {
+        "model_id": 61,
+        "ids": "theallysMix_iiW.safetensors [48c53e1c]",
+        "name": "TheAlly's Mix II"
+      },
+      {
+        "model_id": 62,
+        "ids": "timeless_v1.safetensors [8d6c71f6]",
+        "name": "Timeless V1"
+      },
+      {
+        "model_id": 63,
+        "ids": "toonYou_beta6.safetensors [a3585c66]",
+        "name": "ToonYou Beta 6"
+      }
+    ]
+  }
+  
