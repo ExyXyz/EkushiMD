@@ -1,7 +1,7 @@
-{ 
-  "name": "Ekushi Bot",
+{
+  "name": "ekushi-bot",
   "version": "1.2.5",
-  "description": "WhatsApp Using Lib Baileys Multi Device",
+  "description": "WhatsApp Bot Using Baileys Multi Device",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -113,4 +113,3 @@
   },
   "homepage": "https://github.com/gssbotwa/Gss_Botwa2#readme"
 }
- 
