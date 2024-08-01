@@ -23,7 +23,9 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
- 
+const currentTime = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
+
+
 var low
 try {
   low = require('lowdb')
@@ -241,7 +243,6 @@ gss.ev.on('messages.update', async chatUpdate => {
 
  
 
-/*WELCOME LEFT*/
 gss.ev.on('group-participants.update', async (anu) => {
     if (global.welcome) {
         console.log(anu);
@@ -250,52 +251,43 @@ gss.ev.on('group-participants.update', async (anu) => {
             let participants = anu.participants;
 
             for (let num of participants) {
+                let ppuser;
                 try {
                     ppuser = await gss.profilePictureUrl(num, 'image');
                 } catch (err) {
                     ppuser = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png?q=60';
                 }
 
-                // Welcome message
+                const userName = num.split('@')[0];
+                const joinTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
+                const joinDate = moment.tz('Asia/Jakarta').format('DD/MM/YYYY');
+                const membersCount = metadata.participants.length;
+                const groupName = metadata.subject;
+
                 if (anu.action == 'add') {
-                    const userName = num.split('@')[0];
-                    const joinTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
-                    const joinDate = moment.tz('Asia/Jakarta').format('DD/MM/YYYY');
-                    const membersCount = metadata.participants.length;
+                    const welcomeUrl = `https://api.lolhuman.xyz/api/base/welcome?apikey=ExyV&img1=${ppuser}&img2=${ppuser}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${encodeURIComponent(userName)}&member=${membersCount}&groupname=${encodeURIComponent(groupName)}`;
+                    
+                    const { data } = await axios.get(welcomeUrl, { responseType: 'arraybuffer' });
+                    const welcomeImage = Buffer.from(data, 'binary');
 
-                    const welcomeMessage = `> Hello @${userName}! Welcome to *${metadata.subject}*.\n> You are the ${membersCount}th member.\n> Joined at: ${joinTime} on ${joinDate}`;
+                    const welcomeMessage = `> Hello @${userName}! Welcome to *${groupName}*.\n> You are the ${membersCount}th member.\n> Joined at: ${joinTime} on ${joinDate}`;
 
-                    gss.sendMessage(anu.id, {
-                        text: welcomeMessage,
-                        contextInfo: {
-                            externalAdReply: {
-                                showAdAttribution: false,
-                                title: userName,
-                                sourceUrl: ppuser,
-                                body: `${metadata.subject}`
-                            }
-                        }
+                    await gss.sendMessage(anu.id, {
+                        image: welcomeImage,
+                        caption: welcomeMessage,
                     });
                 }
-                // Left message
                 else if (anu.action == 'remove') {
-                    const userName = num.split('@')[0];
-                    const leaveTime = moment.tz('Asia/Jakarta').format('HH:mm:ss');
-                    const leaveDate = moment.tz('Asia/Jakarta').format('DD/MM/YYYY');
-                    const membersCount = metadata.participants.length;
+                    const leaveUrl = `https://api.lolhuman.xyz/api/base/welcome?apikey=ExyV&img1=${ppuser}&img2=${ppuser}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${encodeURIComponent(userName)}&member=${membersCount}&groupname=${encodeURIComponent(groupName)}`;
 
-                    const leftMessage = `> Goodbye @${userName} from ${metadata.subject}.\n> We are now ${membersCount} in the group.\n> Left at: ${leaveTime} on ${leaveDate}`;
+                    const { data } = await axios.get(leaveUrl, { responseType: 'arraybuffer' });
+                    const leaveImage = Buffer.from(data, 'binary');
 
-                    gss.sendMessage(anu.id, {
-                        text: leftMessage,
-                        contextInfo: {
-                            externalAdReply: {
-                                showAdAttribution: false,
-                                title: userName,
-                                sourceUrl: ppuser,
-                                body: `${metadata.subject}`
-                            }
-                        }
+                    const leftMessage = `> Goodbye @${userName} from *${groupName}*.\n> We are now ${membersCount} in the group.\n> Left at: ${joinTime} on ${joinDate}`;
+
+                    await gss.sendMessage(anu.id, {
+                        image: leaveImage,
+                        caption: leftMessage,
                     });
                 }
             }
@@ -304,6 +296,7 @@ gss.ev.on('group-participants.update', async (anu) => {
         }
     }
 });
+
 
 	
     // Setting
@@ -392,7 +385,7 @@ gss.ev.on('group-participants.update', async (anu) => {
         // Add your custom message when the connection is open
         console.log('Connected...', update);
         gss.sendMessage(gss.user.id, {
-            text: `*BOT ACTIVATED*\n`
+            text: `*BOT ACTIVATED*\nTime: ${currentTime}`
         });
     }
 });
