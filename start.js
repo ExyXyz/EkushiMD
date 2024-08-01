@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 
-const yellowBlink = "\x1b[33m\x1b[5m"; // Yellow color and blink
-const reset = "\x1b[0m"; // Reset
+const yellowBlink = "\x1b[33m\x1b[5m"; 
+const reset = "\x1b[0m"; 
 
 function logWithColor(message) {
     console.log(`${yellowBlink}${message}${reset}`);
@@ -12,20 +12,23 @@ function startApp() {
 
     app.stderr.on('data', (data) => {
         const errorMessage = data.toString();
-        console.error(errorMessage); // Log the error message
-        if (errorMessage.includes("TypeError: Cannot destructure property 'user' of '(0 , WABinary_1.jidDecode)(...)' as it is undefined.")) {
+        console.error(errorMessage); 
+
+        if (errorMessage.includes("TypeError: Cannot destructure property 'user' of '(0 , WABinary_1.jidDecode)(...)' as it is undefined.") ||
+            errorMessage.includes("Rate limit error detected. Exiting...") ||
+            errorMessage.includes("undefined:1") ||
+            errorMessage.includes("error code: 502")) {
             logWithColor('Detected specific error. Restarting application...');
-            app.kill(); // This will terminate the current running app
-            startApp(); // This will start the app again
+            app.kill(); 
+            startApp(); 
         }
     });
 
-
     setTimeout(() => {
         logWithColor('Restarting application due to timeout...');
-        app.kill(); // This will terminate the current running app
-        startApp(); // This will start the app again
-    }, 1300000); // 1 hour = 3600000 milliseconds
+        app.kill(); 
+        startApp(); 
+    }, 1300000); 
 }
 
 startApp();
