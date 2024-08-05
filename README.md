@@ -43,7 +43,7 @@
 
 ## `DEVELOPERS`
 <div align="center">
-<a href="[https://github.com/Exy_Xyz]"><img src="https://github.com/Exy_Xyz.png" width="200" height="200" alt="Ash"/></a>
+<a href="[https://github.com/Exy_Xyz]"><img src="https://github.com/ExyXyz.png" width="200" height="200" alt="Ash"/></a>
  </div>
 <br>
 <h4 align="left">
