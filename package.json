@@ -1,5 +1,5 @@
 {
-  "name": "gss-botwa", // Replace with a valid name
+  "name": "ekushi", // Replace with a valid name
   "version": "1.2.5",
   "description": "WhatsApp Using Lib Baileys Multi Device",
   "main": "index.js",
