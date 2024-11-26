@@ -63,14 +63,6 @@
   <a href="https://www.youtube.com/@Exy_Xyz?sub_confirmation=1">
     <img alt=Support height="70" src="https://telegra.ph/file/eb6347e2764939fbbd35d.png"> 
   </p>
-    
- ***Tap On Logo To Contat Me***
-
-
- <p align="left">
-<a href="mailto:darefahreza@gmail.com"><img title="Author" src="https://img.shields.io/badge/GMAIL-ME-black?style=for-the-badge&logo=Gmail"></a>
- <p align="left"> 
-  <a href="https://wa.me/6283878300449?text=Hi+Bro...+I+need+some+help"><img title="Author" src="https://img.shields.io/badge/WHATSAPP-ME-red?style=for-the-badge&logo=WhatsApp"></a>
   
    
 
